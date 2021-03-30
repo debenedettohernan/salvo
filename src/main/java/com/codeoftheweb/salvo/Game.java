@@ -1,8 +1,9 @@
 package com.codeoftheweb.salvo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -11,36 +12,36 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import static java.util.stream.Collectors.toList;
 
 @Entity
-public class Player {
+public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    private long id;
+    public long id;
 
-    private String userName;
+    public LocalDateTime creationDate;
 
-    @OneToMany(fetch=FetchType.EAGER,mappedBy="player")
+    @OneToMany(fetch=FetchType.EAGER,mappedBy="game")
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
-    public Player() {
+    public Game() {
     }
 
-    public Player(String userName) {
-        this.userName = userName;
+    public Game(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
     }
-
     public void AddGamePlayer(GamePlayer gamePlayer){
-        gamePlayer.setPlayer(this);
+        gamePlayer.setGame(this);
         gamePlayers.add(gamePlayer);
     }
-
-    public List<Game> getGames() {
-        return gamePlayers.stream().map(sub -> sub.getGame()).collect(toList());
+    @JsonIgnore
+    public List<Player> getPlayers() {
+        return gamePlayers.stream().map(sub -> sub.getPlayer()).collect(toList());
     }
 
     public long getId() {
@@ -51,14 +52,14 @@ public class Player {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public LocalDateTime getCreationDate() {
+        return creationDate;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
     }
-
+    @JsonIgnore
     public Set<GamePlayer> getGamePlayers() {
         return gamePlayers;
     }
@@ -71,13 +72,13 @@ public class Player {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Player player = (Player) o;
-        return id == player.id && Objects.equals(userName, player.userName);
+        Game game = (Game) o;
+        return id == game.id && Objects.equals(creationDate, game.creationDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName);
+        return Objects.hash(id, creationDate);
     }
 
 }
