@@ -3,10 +3,7 @@ package com.codeoftheweb.salvo;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,8 +21,9 @@ public class Player {
 
     private String userName;
 
-    @OneToMany(fetch=FetchType.EAGER,mappedBy="player")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "player")
     private Set<GamePlayer> gamePlayers = new HashSet<>();
+
 
     public Player() {
     }
@@ -34,7 +32,7 @@ public class Player {
         this.userName = userName;
     }
 
-    public void AddGamePlayer(GamePlayer gamePlayer){
+    public void AddGamePlayer(GamePlayer gamePlayer) {
         gamePlayer.setPlayer(this);
         gamePlayers.add(gamePlayer);
     }
@@ -66,6 +64,8 @@ public class Player {
     public void setGamePlayers(Set<GamePlayer> gamePlayers) {
         this.gamePlayers = gamePlayers;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

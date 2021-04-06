@@ -1,0 +1,28 @@
+.color0 {
+    background-color: aqua !important;
+}
+
+.color1 {
+    background-color: red !important;
+}
+
+.color2 {
+    background-color: saddlebrown !important;
+}
+
+.color3 {
+    background-color: seagreen !important;
+}
+
+.color4 {
+    background-color: yellow !important;
+}
+
+.tables {
+    width: 40%;
+}
+
+.casillas {
+    width: 3%;
+    text-align: center;
+}

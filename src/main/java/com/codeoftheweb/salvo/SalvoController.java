@@ -1,6 +1,8 @@
 package com.codeoftheweb.salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,9 @@ public class SalvoController {
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
 
+    @Autowired
+    private ShipRepository shipRepository;
+
     @RequestMapping("/games")
     public Set<Map<String, Object>> getGames() {
         return gameRepository.findAll().stream().map(this::gameDTO).collect(toSet());
@@ -33,9 +38,14 @@ public class SalvoController {
         return playerRepository.findAll().stream().map(this::playersDTO).collect(toSet());
     }
 
-    @RequestMapping("/gamePlayers")
+    @GetMapping("/gamePlayers")
     public Set<Map<String, Object>> getGamePlayers() {
         return gamePlayerRepository.findAll().stream().map(this::gamePlayersDTO).collect(toSet());
+    }
+
+    @GetMapping("/game_view/{gamePlayerId}")
+    public Map<String, Object> findGamePlayer(@PathVariable long gamePlayerId) {
+        return gameViewDTO(gamePlayerRepository.findById(gamePlayerId).get());
     }
 
     public Map<String, Object> gameDTO(Game game ) {
@@ -61,6 +71,24 @@ public class SalvoController {
         dtoGamePlayer.put("player", playersDTO(gamePlayer.getPlayer()));
 
         return dtoGamePlayer;
-
     }
+
+    public Map<String, Object> shipDTO(Ship ship ) {
+        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        dto.put("type", ship.getTypeShips());
+        dto.put("ubication",ship.getUbication());
+
+        return dto;
+    }
+
+    public Map<String, Object> gameViewDTO(GamePlayer gamePlayer ) {
+        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        dto.put("id", gamePlayer.getGame().getId());
+        dto.put("date",gamePlayer.getGame().getCreationDate());
+        dto.put("gamePlayers",gamePlayer.getGame().getGamePlayers().stream().map(this::gamePlayersDTO).collect(toSet()));
+        dto.put("ships", gamePlayer.getShips().stream().map(this::shipDTO).collect(toSet()));
+
+        return dto;
+    }
+
 }
