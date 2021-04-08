@@ -19,6 +19,7 @@ var app = new Vue({
         games: [],
         letras: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
         numeros: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        letras1: ["A!", "B!", "C!", "D!", "E!", "F!", "G!", "H!", "I!", "J!"],
         player: {
             player1: { email: " " },
             player2: { email: " " },
@@ -48,3 +49,12 @@ function pantallaJugador() {
         }
     }
 }
+
+/*function disparos() {
+    for (var i = 0; i < app.games.salvo.length; i++) {
+        for (var j = 0; j < )
+            if (app.games.salvo[i].ubication == app.ships.ubication) {
+                document.getElementById(app.games.salvo[i].ubi)
+            }
+    }
+}*/

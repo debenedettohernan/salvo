@@ -4,10 +4,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.jta.UserTransactionAdapter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Set;
 
 
 @SpringBootApplication
@@ -19,7 +20,7 @@ public class SalvoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip) {
+	public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip, SalvoRepository repositorySalvo) {
 		return (args) -> {
 
 			Game game1 = new Game(LocalDateTime.now());
@@ -68,6 +69,14 @@ public class SalvoApplication {
 			Ship ship24 = new Ship("Destroyer", gamePlayer5,List.of("A7","A8","A9"));
 			Ship ship25 = new Ship("Patrol Boat", gamePlayer5,List.of("C7","C8"));
 
+			Salvo salvo1 = new Salvo(1 , gamePlayer1, Set.of("B5","C5","F1"));
+			Salvo salvo2 = new Salvo(2 , gamePlayer1, Set.of("F2","D5"));
+			Salvo salvo3 = new Salvo(1 , gamePlayer2, Set.of("B4","B5","B6"));
+			Salvo salvo4 = new Salvo(2 , gamePlayer2, Set.of("E1","H3","A2"));
+			Salvo salvo5 = new Salvo(1 , gamePlayer3, Set.of("G6","H6","A4"));
+			Salvo salvo6 = new Salvo(2 , gamePlayer3, Set.of("A2","A3","D8"));
+			Salvo salvo7 = new Salvo(1 , gamePlayer4, Set.of("B4","C6","J9"));
+
 			repositoryPlayer.save(player1);
 			repositoryPlayer.save(player2);
 			repositoryPlayer.save(player3);
@@ -110,7 +119,13 @@ public class SalvoApplication {
 			repositoryShip.save(ship24);
 			repositoryShip.save(ship25);
 
-
+			repositorySalvo.save(salvo1);
+			repositorySalvo.save(salvo2);
+			repositorySalvo.save(salvo3);
+			repositorySalvo.save(salvo4);
+			repositorySalvo.save(salvo5);
+			repositorySalvo.save(salvo6);
+			repositorySalvo.save(salvo7);
 
 		};
 	}

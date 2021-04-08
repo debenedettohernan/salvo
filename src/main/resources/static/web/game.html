@@ -9,26 +9,44 @@
     <link href="css/styles.css/styles.css" rel="stylesheet" type="text/css">
 
 </head>
-<div id="app">
-    <div>
-        <h1>{{player.player1.email}} vs {{player.player2.email}}</h1>
+<div id="app" class="container">
+
+    <head></head>
+    <!--para no olvidar la cabecera-->
+    <div class="row">
+        <h1 class="col-5">{{player.player1.email}} </h1>
+        <img class="col-1" src="images/vs.png" alt="vs">
+        <h1 class="col-5">{{player.player2.email}}</h1>
     </div>
 
     <body>
-        <main>
-            <div>
-                <table class="table table-bordered border-primary tables">
+        <main class="row">
+            <div class="col-6">
+                <table class="table table-dark table-bordered border-primary tables">
                     <thead>
                         <th></th>
                         <th class="casillas" v-for="numero in numeros">{{numero}}</th>
                     </thead>
                     <tbody v-for="letra in letras">
                         <tr>
-                            <td class="casillas">{{letra}}</td>
+                            <td class="casillas"><strong>{{letra}}</strong></td>
                             <td v-bind:id="letra + numero" v-for="numero in numeros"></td>
                         </tr>
                     </tbody>
-
+                </table>
+            </div>
+            <div class="col-6">
+                <table class="table table-dark table-bordered border-primary tables">
+                    <thead>
+                        <th></th>
+                        <th class="casillas" v-for="numero in numeros">{{numero}}</th>
+                    </thead>
+                    <tbody v-for="letra1 in letras1">
+                        <tr>
+                            <td class="casillas"><strong>{{letra1}}</strong></td>
+                            <td v-bind:id="letra1 + numero" v-for="numero in numeros"></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
 </div>

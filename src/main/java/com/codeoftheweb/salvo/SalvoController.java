@@ -28,6 +28,9 @@ public class SalvoController {
     @Autowired
     private ShipRepository shipRepository;
 
+    @Autowired
+    private SalvoRepository salvoRepository;
+
     @RequestMapping("/games")
     public Set<Map<String, Object>> getGames() {
         return gameRepository.findAll().stream().map(this::gameDTO).collect(toSet());
@@ -81,12 +84,24 @@ public class SalvoController {
         return dto;
     }
 
+    public Map<String, Object> salvoDTO(Salvo salvo ) {
+        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        dto.put("turn", salvo.getTurn());
+        dto.put("gamePlayer", salvo.getGamePlayer().getPlayer().getId());
+        dto.put("ubication",salvo.getSalvoUbication());
+
+
+        return dto;
+    }
+
     public Map<String, Object> gameViewDTO(GamePlayer gamePlayer ) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", gamePlayer.getGame().getId());
         dto.put("date",gamePlayer.getGame().getCreationDate());
         dto.put("gamePlayers",gamePlayer.getGame().getGamePlayers().stream().map(this::gamePlayersDTO).collect(toSet()));
         dto.put("ships", gamePlayer.getShips().stream().map(this::shipDTO).collect(toSet()));
+        dto.put("salvo", gamePlayer.getGame().getGamePlayers().stream().flatMap(i -> i.getSalvos().stream().map(this::salvoDTO)).collect(toSet()));
+
 
         return dto;
     }
