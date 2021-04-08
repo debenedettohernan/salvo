@@ -41,14 +41,17 @@
                         <th></th>
                         <th class="casillas" v-for="numero in numeros">{{numero}}</th>
                     </thead>
-                    <tbody v-for="letra1 in letras1">
+                    <tbody v-for="letra in letras">
                         <tr>
-                            <td class="casillas"><strong>{{letra1}}</strong></td>
-                            <td v-bind:id="letra1 + numero" v-for="numero in numeros"></td>
+                            <td class="casillas"><strong>{{letra}}</strong></td>
+                            <td v-bind:id="letra + numero + r " v-for="numero in numeros"></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            <footer></footer>
+            <!--para no olvidar pie de pagina-->
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>

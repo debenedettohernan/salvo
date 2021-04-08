@@ -7,21 +7,21 @@
 </head>
 
 <body>
-    <main id=app>
-        <h1>Salvo</h1>
-        <nav>
-            <ol v-for="game in games">
-                <li>{{game.date}}
-                    <ul>
-                        <li v-for="games in game.gamePlayers">{{games.player.email}}</li>
-                    </ul>
-                </li>
+<main id=app>
+    <h1>Salvo</h1>
+    <nav>
+        <ol v-for="game in games">
+            <li>{{game.date}}
+                <ul>
+                    <li v-for="games in game.gamePlayers">{{games.player.email}}</li>
+                </ul>
+            </li>
 
-            </ol>
-        </nav>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <script src="scripts/games.js"></script>
+        </ol>
+    </nav>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="scripts/games.js"></script>
 </body>
 
 </html>

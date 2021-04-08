@@ -22,16 +22,16 @@ public class Salvo {
 
 
     @ElementCollection
-    @Column(name = "salvoUbication")
-    private Set<String> salvoUbication = new HashSet<>();
+    @Column(name = "salvoLocation")
+    private Set<String> salvoLocation = new HashSet<>();
 
     public Salvo() {
     }
 
-    public Salvo(Integer turn, GamePlayer gamePlayer, Set<String> salvoUbication) {
+    public Salvo(Integer turn, GamePlayer gamePlayer, Set<String> salvoLocation) {
         this.turn = turn;
         this.gamePlayer = gamePlayer;
-        this.salvoUbication = salvoUbication;
+        this.salvoLocation = salvoLocation;
     }
 
     public long getId() {
@@ -58,12 +58,12 @@ public class Salvo {
         this.gamePlayer = gamePlayer;
     }
 
-    public Set<String> getSalvoUbication() {
-        return salvoUbication;
+    public Set<String> getSalvoLocation() {
+        return salvoLocation;
     }
 
-    public void setSalvoUbication(Set<String> salvoUbication) {
-        this.salvoUbication = salvoUbication;
+    public void setSalvoLocation(Set<String> salvoLocation) {
+        this.salvoLocation = salvoLocation;
     }
 
 }

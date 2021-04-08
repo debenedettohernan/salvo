@@ -4,9 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class Ship {
@@ -22,16 +20,16 @@ public class Ship {
     private GamePlayer gamePlayer;
 
     @ElementCollection
-    @Column(name = "ubication")
-    private List<String> ubication = new ArrayList<>();
+    @Column(name = "location")
+    private List<String> location = new ArrayList<>();
 
     public Ship() {
     }
 
-    public Ship(String typeShips, GamePlayer gamePlayer, List<String> ubication) {
+    public Ship(String typeShips, GamePlayer gamePlayer, List<String> location) {
         this.typeShips = typeShips;
         this.gamePlayer = gamePlayer;
-        this.ubication = ubication;
+        this.location = location;
     }
 
     public long getId() {
@@ -58,11 +56,11 @@ public class Ship {
         this.gamePlayer = gamePlayer;
     }
 
-    public List<String> getUbication() {
-        return ubication;
+    public List<String> getLocation() {
+        return location;
     }
 
-    public void setUbication(List<String> ubication) {
-        this.ubication = ubication;
+    public void setLocation(List<String> location) {
+        this.location = location;
     }
 }

@@ -19,11 +19,11 @@ public class GamePlayer {
     private LocalDateTime localDate;
 
     @ManyToOne
-    @JoinColumn(name="player_id")
+    @JoinColumn(name = "player_id")
     private Player player;
 
     @ManyToOne
-    @JoinColumn(name="game_id")
+    @JoinColumn(name = "game_id")
     private Game game;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "gamePlayer")
@@ -36,7 +36,7 @@ public class GamePlayer {
     public GamePlayer() {
     }
 
-    public GamePlayer(LocalDateTime localDate, Game game, Player player){
+    public GamePlayer(LocalDateTime localDate, Game game, Player player) {
         this.localDate = localDate;
         this.player = player;
         this.game = game;

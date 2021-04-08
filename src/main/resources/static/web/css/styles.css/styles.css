@@ -7,14 +7,16 @@ body {
 /*disparo barco*/
 
 .fire0 {
-    background-image: url(https://s167.daydaynews.cc/?url=http%3A%2F%2Finews.gtimg.com%2Fnewsapp_bt%2F0%2F12078910444%2F1000);
+    background-color: black !important;
+    background-image: url(https://s167.daydaynews.cc/?url=http%3A%2F%2Finews.gtimg.com%2Fnewsapp_bt%2F0%2F12078910444%2F1000) !important;
+    background-size: cover;
 }
 
 
 /*disparo agua*/
 
 .fire1 {
-    background-image: url(https://www.blogdelfotografo.com/wp-content/uploads/2011/08/Fotografiar-una-Gota-de-Agua.jpg);
+    background-image: url(https://www.blogdelfotografo.com/wp-content/uploads/2011/08/Fotografiar-una-Gota-de-Agua.jpg) i !important;
 }
 
 .color0 {
@@ -39,7 +41,7 @@ body {
 
 .tables {
     width: 90%;
-    box-shadow: 2px solid aqua;
+    opacity: 93%;
 }
 
 .casillas {
