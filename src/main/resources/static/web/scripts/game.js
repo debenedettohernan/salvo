@@ -11,6 +11,7 @@ fetch('http://localhost:8080/api/game_view/' + gameViewParam)
         asignarUbicacion();
         pantallaJugador();
         ubicacionDisparos();
+        disparosAcertados();
 
     })
 
@@ -35,7 +36,7 @@ function asignarUbicacion() {
 
     for (var i = 0; i < nave.length; i++) {
         for (var j = 0; j < nave[i].locations.length; j++) {
-            document.getElementById(nave[i].locations[j]).className = "color" + i;
+            document.getElementById(nave[i].locations[j]).className = "color";
         }
     }
 };
@@ -58,15 +59,32 @@ function ubicacionDisparos() {
 
     for (var i = 0; i < disparosPlayer1.length; i++) {
         for (var j = 0; j < disparosPlayer1[i].locations.length; j++) {
-            document.getElementById(disparosPlayer1[i].locations[j] + 'r').className = "fire0";
+            document.getElementById(disparosPlayer1[i].locations[j] + 'r').className = "fire1";
             document.getElementById(disparosPlayer1[i].locations[j] + 'r').innerHTML = disparosPlayer1[i].turn
         }
     }
-
     for (var i = 0; i < disparosPlayer2.length; i++) {
         for (var j = 0; j < disparosPlayer2[i].locations.length; j++) {
-            document.getElementById(disparosPlayer2[i].locations[j]).className = "fire0";
+
+            document.getElementById(disparosPlayer2[i].locations[j]).className = "fire1";
             document.getElementById(disparosPlayer2[i].locations[j]).innerHTML = disparosPlayer2[i].turn
         }
     }
 };
+
+function disparosAcertados() {
+    var disparosPlayer2 = app.games.salvo.filter(slv => slv.player == app.player.player2.id)
+
+    for (i = 0; i < disparosPlayer2.length; i++) {
+        for (j = 0; j < disparosPlayer2[i].locations.length; j++) {
+            for (k = 0; k < app.games.ships.length; k++) {
+
+                if (app.games.ships[k].locations.includes(disparosPlayer2[i].locations[j])) {
+                    document.getElementById(disparosPlayer2[i].locations[j]).className = "fire0 ";
+                    document.getElementById(disparosPlayer2[i].locations[j]).innerHTML = disparosPlayer2[i].turn;
+                }
+            }
+        }
+    }
+
+}
