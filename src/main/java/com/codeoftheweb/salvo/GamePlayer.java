@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -46,6 +47,8 @@ public class GamePlayer {
         ship.setGamePlayer(this);
         ships.add(ship);
     }
+
+
 
     public void setGame(Game game) {
         this.game = game;
