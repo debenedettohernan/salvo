@@ -24,6 +24,9 @@ public class Player {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "player")
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "player")
+    private List<Score> scores = new ArrayList<>();
+
 
     public Player() {
     }
@@ -35,6 +38,15 @@ public class Player {
     public void AddGamePlayer(GamePlayer gamePlayer) {
         gamePlayer.setPlayer(this);
         gamePlayers.add(gamePlayer);
+    }
+
+    public void AddScore(Score score) {
+        score.setPlayer(this);
+        scores.add(score);
+    }
+
+    public Optional<Score> getScore(Game game){
+        return  getScores().stream().filter(p -> p.getGame().equals(game)).findFirst();
     }
 
     public List<Game> getGames() {
@@ -65,7 +77,13 @@ public class Player {
         this.gamePlayers = gamePlayers;
     }
 
+    public List<Score> getScores() {
+        return scores;
+    }
 
+    public void setScores(List<Score> scores) {
+        this.scores = scores;
+    }
 
     @Override
     public boolean equals(Object o) {

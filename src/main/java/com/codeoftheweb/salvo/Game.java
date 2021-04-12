@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,6 +26,9 @@ public class Game {
     @OneToMany(fetch=FetchType.EAGER,mappedBy="game")
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
+    @OneToMany(fetch=FetchType.EAGER,mappedBy="game")
+    private List<Score> scores = new ArrayList<>();
+
     public Game() {
     }
 
@@ -42,6 +42,10 @@ public class Game {
     @JsonIgnore
     public List<Player> getPlayers() {
         return gamePlayers.stream().map(sub -> sub.getPlayer()).collect(toList());
+    }
+    public void AddScore(Score score) {
+        score.setGame(this);
+        scores.add(score);
     }
 
     public long getId() {
@@ -67,6 +71,15 @@ public class Game {
     public void setGamePlayers(Set<GamePlayer> gamePlayers) {
         this.gamePlayers = gamePlayers;
     }
+
+    public List<Score> getScores() {
+        return scores;
+    }
+
+    public void setScores(List<Score> scores) {
+        this.scores = scores;
+    }
+
 
     @Override
     public boolean equals(Object o) {

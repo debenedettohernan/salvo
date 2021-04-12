@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
 public class Score {
 
     @Id
@@ -15,7 +16,7 @@ public class Score {
 
     private LocalDateTime dateTime;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "game_id")
     private Game game;
 
@@ -75,6 +76,7 @@ public class Score {
     public void setScore(Double score) {
         this.score = score;
     }
+
 
     @Override
     public boolean equals(Object o) {

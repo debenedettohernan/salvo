@@ -34,6 +34,7 @@ public class GamePlayer {
     private Set<Salvo> salvos = new HashSet<>();
 
 
+
     public GamePlayer() {
     }
 
@@ -48,7 +49,9 @@ public class GamePlayer {
         ships.add(ship);
     }
 
-
+    public Optional<Score> getScore() {
+        return player.getScore(this.game);
+    }
 
     public void setGame(Game game) {
         this.game = game;

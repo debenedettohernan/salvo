@@ -20,7 +20,7 @@ public class SalvoApplication {
     }
 
     @Bean
-    public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip, SalvoRepository repositorySalvo) {
+    public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip, SalvoRepository repositorySalvo, ScoreRespository respositoryScore) {
         return (args) -> {
 
             Game game1 = new Game(LocalDateTime.now());
@@ -77,6 +77,8 @@ public class SalvoApplication {
             Salvo salvo6 = new Salvo(2, gamePlayer3, Set.of("A2", "A3", "D8"));
             Salvo salvo7 = new Salvo(1, gamePlayer4, Set.of("B4", "C6", "J9"));
 
+            Score score1 = new Score()
+
             repositoryPlayer.save(player1);
             repositoryPlayer.save(player2);
             repositoryPlayer.save(player3);
@@ -126,6 +128,13 @@ public class SalvoApplication {
             repositorySalvo.save(salvo5);
             repositorySalvo.save(salvo6);
             repositorySalvo.save(salvo7);
+
+            respositoryScore.save(score1);
+            respositoryScore.save(score2);
+            respositoryScore.save(score3);
+            respositoryScore.save(score4);
+            respositoryScore.save(score5);
+            respositoryScore.save(score6);
 
         };
     }
