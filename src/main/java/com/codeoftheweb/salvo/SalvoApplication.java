@@ -20,12 +20,15 @@ public class SalvoApplication {
     }
 
     @Bean
-    public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip, SalvoRepository repositorySalvo, ScoreRespository respositoryScore) {
+    public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip, SalvoRepository repositorySalvo, ScoreRepository respositoryScore) {
         return (args) -> {
 
             Game game1 = new Game(LocalDateTime.now());
             Game game2 = new Game(LocalDateTime.now());
             Game game3 = new Game(LocalDateTime.now());
+            Game game4 = new Game(LocalDateTime.now());
+            Game game5 = new Game(LocalDateTime.now());
+            Game game6 = new Game(LocalDateTime.now());
 
             Player player1 = new Player("t.almeida@ctu.gov");
             Player player2 = new Player("j.bauer@ctu.gov");
@@ -38,6 +41,12 @@ public class SalvoApplication {
             GamePlayer gamePlayer3 = new GamePlayer(LocalDateTime.now(), game2, player3);
             GamePlayer gamePlayer4 = new GamePlayer(LocalDateTime.now(), game2, player4);
             GamePlayer gamePlayer5 = new GamePlayer(LocalDateTime.now(), game3, player5);
+            GamePlayer gamePlayer6 = new GamePlayer(LocalDateTime.now(), game3, player1);
+            GamePlayer gamePlayer7 = new GamePlayer(LocalDateTime.now(), game4, player2);
+            GamePlayer gamePlayer8 = new GamePlayer(LocalDateTime.now(), game4, player1);
+            GamePlayer gamePlayer9 = new GamePlayer(LocalDateTime.now(), game5, player5);
+            GamePlayer gamePlayer10 = new GamePlayer(LocalDateTime.now(), game5, player3);
+            GamePlayer gamePlayer11 = new GamePlayer(LocalDateTime.now(), game6, player5);
 
             Ship ship1 = new Ship("Carrier", gamePlayer1, List.of("A2", "B2", "C2", "D2", "E2"));
             Ship ship2 = new Ship("Battleship", gamePlayer1, List.of("A1", "B1", "C1", "D1"));
@@ -76,8 +85,37 @@ public class SalvoApplication {
             Salvo salvo5 = new Salvo(1, gamePlayer3, Set.of("G6", "H6", "A4"));
             Salvo salvo6 = new Salvo(2, gamePlayer3, Set.of("A2", "A3", "D8"));
             Salvo salvo7 = new Salvo(1, gamePlayer4, Set.of("B4", "C6", "J9"));
+            Salvo salvo8 = new Salvo(2, gamePlayer4, Set.of("J8", "F6", "J9"));
+            Salvo salvo9 = new Salvo(1, gamePlayer5, Set.of("B1", "B2", "B3"));
+            Salvo salvo10 = new Salvo(2, gamePlayer5, Set.of("C4", "F6", "A9"));
+            Salvo salvo11 = new Salvo(1, gamePlayer6, Set.of("A4", "B4", "C4"));
+            Salvo salvo12 = new Salvo(2, gamePlayer6, Set.of("A8", "E4", "E9"));
+            Salvo salvo13 = new Salvo(1, gamePlayer7, Set.of("J4", "B2", "A4"));
+            Salvo salvo14 = new Salvo(2, gamePlayer7, Set.of("J5", "C1", "C2"));
+            Salvo salvo15 = new Salvo(1, gamePlayer8, Set.of("D3", "D1", "D2"));
+            Salvo salvo16 = new Salvo(2, gamePlayer8, Set.of("D8", "F3", "F10"));
+            Salvo salvo17 = new Salvo(1, gamePlayer9, Set.of("A10", "B4", "J4"));
+            Salvo salvo18 = new Salvo(2, gamePlayer9, Set.of("B4", "A1", "A10"));
+            Salvo salvo19 = new Salvo(1, gamePlayer10, Set.of("C2", "C6", "C10"));
+            Salvo salvo20 = new Salvo(2, gamePlayer10, Set.of("A1", "C1", "F1"));
+            Salvo salvo21 = new Salvo(1, gamePlayer11, Set.of("B10", "C10", "D10"));
+            Salvo salvo22 = new Salvo(2, gamePlayer11, Set.of("A5", "B6", "C8"));
 
-            Score score1 = new Score()
+
+
+            Score score1 = new Score(LocalDateTime.now(),game1,player1, 0.0);
+            Score score2 = new Score(LocalDateTime.now(),game1,player2, 1.0);
+            Score score3 = new Score(LocalDateTime.now(),game2,player3, 0.5);
+            Score score4 = new Score(LocalDateTime.now(),game2,player4, 0.5);
+            Score score5 = new Score(LocalDateTime.now(),game3,player5, 1.0);
+            Score score6 = new Score(LocalDateTime.now(),game3,player1, 0.0);
+            Score score7 = new Score(LocalDateTime.now(),game4,player2, 0.5);
+            Score score8 = new Score(LocalDateTime.now(),game4,player1, 0.5);
+            Score score9 = new Score(LocalDateTime.now(),game5,player5, 1.0);
+            Score score10 = new Score(LocalDateTime.now(),game5,player3, 0.0);
+
+
+
 
             repositoryPlayer.save(player1);
             repositoryPlayer.save(player2);
@@ -88,12 +126,21 @@ public class SalvoApplication {
             repositoryGame.save(game1);
             repositoryGame.save(game2);
             repositoryGame.save(game3);
+            repositoryGame.save(game4);
+            repositoryGame.save(game5);
+            repositoryGame.save(game6);
 
             repositoryGamePlayer.save(gamePlayer1);
             repositoryGamePlayer.save(gamePlayer2);
             repositoryGamePlayer.save(gamePlayer3);
             repositoryGamePlayer.save(gamePlayer4);
             repositoryGamePlayer.save(gamePlayer5);
+            repositoryGamePlayer.save(gamePlayer6);
+            repositoryGamePlayer.save(gamePlayer7);
+            repositoryGamePlayer.save(gamePlayer8);
+            repositoryGamePlayer.save(gamePlayer9);
+            repositoryGamePlayer.save(gamePlayer10);
+            repositoryGamePlayer.save(gamePlayer11);
 
             repositoryShip.save(ship1);
             repositoryShip.save(ship2);
@@ -128,6 +175,21 @@ public class SalvoApplication {
             repositorySalvo.save(salvo5);
             repositorySalvo.save(salvo6);
             repositorySalvo.save(salvo7);
+            repositorySalvo.save(salvo8);
+            repositorySalvo.save(salvo9);
+            repositorySalvo.save(salvo10);
+            repositorySalvo.save(salvo11);
+            repositorySalvo.save(salvo12);
+            repositorySalvo.save(salvo13);
+            repositorySalvo.save(salvo14);
+            repositorySalvo.save(salvo15);
+            repositorySalvo.save(salvo16);
+            repositorySalvo.save(salvo17);
+            repositorySalvo.save(salvo18);
+            repositorySalvo.save(salvo19);
+            repositorySalvo.save(salvo20);
+            repositorySalvo.save(salvo21);
+            repositorySalvo.save(salvo22);
 
             respositoryScore.save(score1);
             respositoryScore.save(score2);
@@ -135,6 +197,11 @@ public class SalvoApplication {
             respositoryScore.save(score4);
             respositoryScore.save(score5);
             respositoryScore.save(score6);
+            respositoryScore.save(score7);
+            respositoryScore.save(score8);
+            respositoryScore.save(score9);
+            respositoryScore.save(score10);
+
 
         };
     }

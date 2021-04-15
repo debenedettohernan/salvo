@@ -46,7 +46,7 @@ public class Player {
     }
 
     public Optional<Score> getScore(Game game){
-        return  getScores().stream().filter(p -> p.getGame().equals(game)).findFirst();
+        return  scores.stream().filter(p -> p.getGame().equals(game)).findFirst();
     }
 
     public List<Game> getGames() {
