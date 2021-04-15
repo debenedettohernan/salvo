@@ -10,12 +10,14 @@ fetch('http://localhost:8080/api/games')
         totalWins();
         totalTies()
         totalLosses()
+        tablaScore();
     })
 
 var app = new Vue({
     el: '#app',
     data: {
-        games: []
+        games: [],
+        scorePlayers: [],
     }
 })
 
@@ -29,11 +31,10 @@ function players() {
             }
 
         })
-
-        return players;
     });
-    console.log(players)
-}
+    return players;
+
+};
 
 
 function totalScore(email) {
@@ -45,7 +46,9 @@ function totalScore(email) {
             }
 
         }))
-}
+    return total;
+
+};
 
 function totalWins(email) {
     var wins = 0
@@ -56,8 +59,9 @@ function totalWins(email) {
                 wins += gamePlayer.score == 1
             }
         }))
-    console.log(wins)
-}
+    return wins;
+
+};
 
 function totalTies(email) {
     var ties = 0.0
@@ -68,8 +72,8 @@ function totalTies(email) {
                 ties += gamePlayer.score == 0.5
             }
         }))
-    console.log(ties)
-}
+    return ties;
+};
 
 function totalLosses(email) {
     var losses = 0
@@ -80,5 +84,30 @@ function totalLosses(email) {
                 losses += gamePlayer.score == 0
             }
         }))
-    console.log(losses)
-}
+    return losses;
+};
+
+
+function tablaScore() {
+    var scorePlayer = []
+    var totalPlayers = players()
+
+    totalPlayers.forEach(player => {
+        var total = totalScore(player)
+        var win = totalWins(player)
+        var ties = totalTies(player)
+        var losses = totalLosses(player)
+
+        scorePlayer = {
+            email: player,
+            totalScore: total,
+            winScore: win,
+            tiesScore: ties,
+            lossesScore: losses
+
+        }
+
+        app.scorePlayers.push(scorePlayer)
+    })
+
+};

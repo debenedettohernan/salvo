@@ -32,6 +32,7 @@ body {
 .casillas {
     width: 9.09%;
     text-align: center;
+    text-decoration-style: solid;
 }
 
 div h1 {
