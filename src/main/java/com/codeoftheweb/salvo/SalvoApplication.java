@@ -1,9 +1,18 @@
 package com.codeoftheweb.salvo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import java.time.LocalDateTime;
@@ -19,6 +28,12 @@ public class SalvoApplication {
         SpringApplication.run(SalvoApplication.class);
     }
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
     @Bean
     public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip, SalvoRepository repositorySalvo, ScoreRepository respositoryScore) {
         return (args) -> {
@@ -30,11 +45,11 @@ public class SalvoApplication {
             Game game5 = new Game(LocalDateTime.now());
             Game game6 = new Game(LocalDateTime.now());
 
-            Player player1 = new Player("t.almeida@ctu.gov");
-            Player player2 = new Player("j.bauer@ctu.gov");
-            Player player3 = new Player("c.obrian@ctu.gov");
-            Player player4 = new Player("kim_bauer@gmail.com");
-            Player player5 = new Player("hernan.debenedetto@gmail.com");
+            Player player1 = new Player("t.almeida@ctu.gov", "mole");
+            Player player2 = new Player("j.bauer@ctu.gov","24" );
+            Player player3 = new Player("c.obrian@ctu.gov","42");
+            Player player4 = new Player("kim_bauer@gmail.com", "kb");
+            Player player5 = new Player("hernan.debenedetto@gmail.com", "hernan");
 
             GamePlayer gamePlayer1 = new GamePlayer(LocalDateTime.now(), game1, player1);
             GamePlayer gamePlayer2 = new GamePlayer(LocalDateTime.now(), game1, player2);
@@ -205,5 +220,23 @@ public class SalvoApplication {
 
         };
     }
+    @Configuration
+    class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
+        @Autowired
+        PlayerRepository playerRepository;
+
+        @Override
+        public void init(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(inputName-> {
+                Player player = playerRepository.findByUserName(inputName);
+                if (player != null) {
+                    return new User(player.getUserName(), player.getPassword(),
+                            AuthorityUtils.createAuthorityList("USER"));
+                } else {
+                    throw new UsernameNotFoundException("Unknown user: " + inputName);
+                }
+            });
+        }
+    }
 }

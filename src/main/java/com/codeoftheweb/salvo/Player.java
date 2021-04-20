@@ -21,6 +21,8 @@ public class Player {
 
     private String userName;
 
+    private String password;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "player")
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
@@ -31,8 +33,9 @@ public class Player {
     public Player() {
     }
 
-    public Player(String userName) {
+    public Player(String userName, String password) {
         this.userName = userName;
+        this.password = password;
     }
 
     public void AddGamePlayer(GamePlayer gamePlayer) {
@@ -83,6 +86,14 @@ public class Player {
 
     public void setScores(List<Score> scores) {
         this.scores = scores;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
