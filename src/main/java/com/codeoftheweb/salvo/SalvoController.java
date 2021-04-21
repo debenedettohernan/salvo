@@ -1,10 +1,11 @@
 package com.codeoftheweb.salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.Map;
@@ -32,12 +33,20 @@ public class SalvoController {
     @Autowired
     private SalvoRepository salvoRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @RequestMapping("/player")
+    public Player getAll(Authentication authentication) {
+        return playerRepository.findByUserName(authentication.getName());
+    }
+
     @RequestMapping("/games")
     public Set<Map<String, Object>> getGames() {
         return gameRepository.findAll().stream().map(this::gameDTO).collect(toSet());
     }
 
-    @RequestMapping("/players")
+    @PostMapping("/players")
     public Set<Map<String, Object>> getPlayers() {
         return playerRepository.findAll().stream().map(this::playersDTO).collect(toSet());
     }
@@ -51,6 +60,23 @@ public class SalvoController {
     public Map<String, Object> findGamePlayer(@PathVariable long gamePlayerId) {
         return gameViewDTO(gamePlayerRepository.findById(gamePlayerId).get());
     }
+
+   /* @RequestMapping(path = "/register", method = RequestMethod.POST)
+    public ResponseEntity<Object> register(
+            @RequestParam String email, @RequestParam String password) {
+
+        if (email.isEmpty() || password.isEmpty()) {
+            return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
+        }
+
+        if (playerRepository.findByUserName(email) !=  null) {
+            return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
+        }
+
+        playerRepository.save(new Player(email, passwordEncoder.encode(password)));
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }*/
+
 
     public Map<String, Object> gameDTO(Game game) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();

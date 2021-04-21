@@ -4,24 +4,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.WebAttributes;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 
 @SpringBootApplication
-public class SalvoApplication {
+public class SalvoApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
 
@@ -30,10 +39,7 @@ public class SalvoApplication {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+
     @Bean
     public CommandLineRunner initData(PlayerRepository repositoryPlayer, GameRepository repositoryGame, GamePlayerRepository repositoryGamePlayer, ShipRepository repositoryShip, SalvoRepository repositorySalvo, ScoreRepository respositoryScore) {
         return (args) -> {
@@ -45,11 +51,11 @@ public class SalvoApplication {
             Game game5 = new Game(LocalDateTime.now());
             Game game6 = new Game(LocalDateTime.now());
 
-            Player player1 = new Player("t.almeida@ctu.gov", "mole");
-            Player player2 = new Player("j.bauer@ctu.gov","24" );
-            Player player3 = new Player("c.obrian@ctu.gov","42");
-            Player player4 = new Player("kim_bauer@gmail.com", "kb");
-            Player player5 = new Player("hernan.debenedetto@gmail.com", "hernan");
+            Player player1 = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
+            Player player2 = new Player("j.bauer@ctu.gov",passwordEncoder.encode("24"));
+            Player player3 = new Player("c.obrian@ctu.gov",passwordEncoder.encode("42"));
+            Player player4 = new Player("kim_bauer@gmail.com",passwordEncoder.encode("kb"));
+            Player player5 = new Player("hernan.debenedetto@gmail.com", passwordEncoder.encode("hernan"));
 
             GamePlayer gamePlayer1 = new GamePlayer(LocalDateTime.now(), game1, player1);
             GamePlayer gamePlayer2 = new GamePlayer(LocalDateTime.now(), game1, player2);
@@ -220,23 +226,61 @@ public class SalvoApplication {
 
         };
     }
-    @Configuration
-    class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
-        @Autowired
-        PlayerRepository playerRepository;
+}
+@Configuration
+class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
-        @Override
-        public void init(AuthenticationManagerBuilder auth) throws Exception {
-            auth.userDetailsService(inputName-> {
-                Player player = playerRepository.findByUserName(inputName);
-                if (player != null) {
-                    return new User(player.getUserName(), player.getPassword(),
-                            AuthorityUtils.createAuthorityList("USER"));
-                } else {
-                    throw new UsernameNotFoundException("Unknown user: " + inputName);
-                }
-            });
+    @Autowired
+    PlayerRepository playerRepository;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Override
+    public void init(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(inputName-> {
+            Player player = playerRepository.findByUserName(inputName);
+            if (player != null) {
+                return new User(player.getUserName(), player.getPassword(),
+                        AuthorityUtils.createAuthorityList("USER"));
+
+            } else {
+                throw new UsernameNotFoundException("Unknown user: " + inputName);
+            }
+        });
+    }
+}
+
+@Configuration
+@EnableWebSecurity
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/web/game.html", "/api/game_view/**", "/rest/**","/h2-console").hasAuthority("USER")
+                .antMatchers("/**").permitAll();
+        http.formLogin()
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .loginPage("/api/login");
+
+        http.logout().logoutUrl("/api/logout");
+        http.csrf().disable();
+        http.exceptionHandling().authenticationEntryPoint((req, res, exc) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED));
+        http.formLogin().successHandler((req, res, auth) -> clearAuthenticationAttributes(req));
+        http.formLogin().failureHandler((req, res, exc) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED));
+        http.logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
+    }
+
+    private void clearAuthenticationAttributes(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+
         }
+
     }
 }
