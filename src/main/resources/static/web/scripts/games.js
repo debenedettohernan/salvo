@@ -105,7 +105,7 @@ fetch('http://localhost:8080/api/games')
     })
     .then(function(data) {
 
-        app.games = data;
+        app.games = data.games;
         app.players();
         app.tablaScore();
     })
