@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -46,9 +47,12 @@ public class SalvoController {
     public Map<String, Object> getAllGames(Authentication authentication) {
         Map<String , Object > dto = new LinkedHashMap<String, Object>();
         if(!isGuest(authentication)){
-            dto.put("player",currentPlayerDTO(authentication));
+            Player authenticationPlayer = playerRepository.findByUserName(authentication.getName());
+            dto.put("player",playersDTO(authenticationPlayer));
         }
-        else{dto.put("player", (null));}
+        else{
+            dto.put("player", (null));
+        }
         dto.put("games", gameRepository.findAll().stream().map(this::gameDTO).collect(toSet()));
         return dto;
     }
@@ -63,28 +67,29 @@ public class SalvoController {
         return gameViewDTO(gamePlayerRepository.findById(gamePlayerId).get());
     }
 
-    @RequestMapping(path = "/players", method = RequestMethod.POST)
+    @PostMapping("/players")
     public ResponseEntity<Object> register(
-            @RequestParam String userName, @RequestParam String password) {
+            @RequestParam String username, @RequestParam String password) {
+        System.out.println(username);
+        System.out.println(password);
 
-        if (userName.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty()) {
             return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
         }
 
-        if (playerRepository.findByUserName(userName) !=  null) {
+        if (playerRepository.findByUserName(username) !=  null) {
             return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
         }
 
-        playerRepository.save(new Player(userName, passwordEncoder.encode(password)));
+        playerRepository.save(new Player(username, passwordEncoder.encode(password)));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-   public Map<String, Object> currentPlayerDTO(Authentication authentication) {
-       Map<String, Object> dto = new LinkedHashMap<String, Object>();
-       dto.put("id", playerRepository.findByUserName(authentication.getName()).getId());
-       dto.put("email", playerRepository.findByUserName(authentication.getName()).getUserName());
 
-       return dto;
-   }
+    @GetMapping("/players")
+    public List<Map<String,Object>> getPlayer(){
+        return playerRepository.findAll().stream().map(this::playersDTO).collect(Collectors.toList());
+    }
+
 
     public Map<String, Object> gameDTO(Game game) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -98,7 +103,7 @@ public class SalvoController {
     public Map<String, Object> playersDTO(Player player) {
         Map<String, Object> dtoPlayer = new LinkedHashMap<String, Object>();
         dtoPlayer.put("id", player.getId());
-        dtoPlayer.put("email", player.getUserName());
+        dtoPlayer.put("name", player.getUserName());
 
         return dtoPlayer;
     }

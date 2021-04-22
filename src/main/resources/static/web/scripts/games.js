@@ -3,6 +3,9 @@ var app = new Vue({
     data: {
         games: [],
         scorePlayers: [],
+        username: "",
+        password: "",
+        player: null,
     },
     methods: {
 
@@ -11,8 +14,8 @@ var app = new Vue({
             app.games.forEach(game => {
                 game.gamePlayers.forEach(gamePlayer => {
 
-                    if (!players.includes(gamePlayer.player.email)) {
-                        players.push(gamePlayer.player.email)
+                    if (!players.includes(gamePlayer.player.name)) {
+                        players.push(gamePlayer.player.name)
                     }
 
                 })
@@ -22,11 +25,11 @@ var app = new Vue({
         },
 
 
-        totalScore: function(email) {
+        totalScore: function(name) {
             var total = 0
             app.games.forEach(game =>
                 game.gamePlayers.forEach(gamePlayer => {
-                    if (email == gamePlayer.player.email) {
+                    if (name == gamePlayer.player.name) {
                         total += gamePlayer.score
                     }
 
@@ -35,12 +38,12 @@ var app = new Vue({
 
         },
 
-        totalWins: function(email) {
+        totalWins: function(name) {
             var wins = 0
             app.games.forEach(game =>
                 game.gamePlayers.forEach(gamePlayer => {
 
-                    if (email == gamePlayer.player.email) {
+                    if (name == gamePlayer.player.name) {
                         wins += gamePlayer.score == 1
                     }
                 }))
@@ -48,24 +51,24 @@ var app = new Vue({
 
         },
 
-        totalTies: function(email) {
+        totalTies: function(name) {
             var ties = 0.0
             app.games.forEach(game =>
                 game.gamePlayers.forEach(gamePlayer => {
 
-                    if (email == gamePlayer.player.email) {
+                    if (name == gamePlayer.player.name) {
                         ties += gamePlayer.score == 0.5
                     }
                 }))
             return ties;
         },
 
-        totalLosses: function(email) {
+        totalLosses: function(name) {
             var losses = 0
             app.games.forEach(game =>
                 game.gamePlayers.forEach(gamePlayer => {
 
-                    if (email == gamePlayer.player.email) {
+                    if (name == gamePlayer.player.name) {
                         losses += gamePlayer.score == 0
                     }
                 }))
@@ -84,7 +87,7 @@ var app = new Vue({
                 var losses = app.totalLosses(player)
 
                 scorePlayer = {
-                    email: player,
+                    name: player,
                     totalScore: total,
                     winScore: win,
                     tiesScore: ties,
@@ -95,8 +98,29 @@ var app = new Vue({
                 app.scorePlayers.push(scorePlayer)
             })
 
-        }
+        },
+        logIn: function() {
 
+            $.post("/api/login", {
+                    username: app.username,
+                    password: app.password
+                })
+                .done(function() { location.reload() })
+                .fail(function() { alert("Check your data and insert it well") })
+        },
+        logOut: function() {
+            $.post("/api/logout")
+                .done(function() { location.reload() })
+                .fail(function() { alert("You can't log out") })
+        },
+        sigIn: function() {
+            $.post("/api/players", {
+                    username: app.username,
+                    password: app.password
+                })
+                .done(function() { app.logIn() })
+                .fail(function() { alert("User is already in use") })
+        }
     }
 })
 fetch('http://localhost:8080/api/games')
@@ -104,7 +128,7 @@ fetch('http://localhost:8080/api/games')
         return respuesta.json();
     })
     .then(function(data) {
-
+        app.player = data.player
         app.games = data.games;
         app.players();
         app.tablaScore();
