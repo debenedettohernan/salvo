@@ -34,7 +34,6 @@ public class GamePlayer {
     private Set<Salvo> salvos = new HashSet<>();
 
 
-
     public GamePlayer() {
     }
 

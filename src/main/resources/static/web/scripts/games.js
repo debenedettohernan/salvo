@@ -120,9 +120,15 @@ var app = new Vue({
                 })
                 .done(function() { app.logIn() })
                 .fail(function() { alert("User is already in use") })
+        },
+        createGame: function() {
+            $.post("/api/games")
+                .done(function(data) { location.href = "http://localhost:8080/web/game.html?gp" + data.gpId })
+                .fail(function() { alert("Can't create the game") })
         }
     }
 })
+
 fetch('http://localhost:8080/api/games')
     .then(function(respuesta) {
         return respuesta.json();

@@ -2,6 +2,7 @@ package com.codeoftheweb.salvo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.Entity;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,10 +24,10 @@ public class Game {
 
     public LocalDateTime creationDate;
 
-    @OneToMany(fetch=FetchType.EAGER,mappedBy="game")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
-    @OneToMany(fetch=FetchType.EAGER,mappedBy="game")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
     private List<Score> scores = new ArrayList<>();
 
     public Game() {
@@ -35,14 +36,17 @@ public class Game {
     public Game(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
-    public void AddGamePlayer(GamePlayer gamePlayer){
+
+    public void AddGamePlayer(GamePlayer gamePlayer) {
         gamePlayer.setGame(this);
         gamePlayers.add(gamePlayer);
     }
+
     @JsonIgnore
     public List<Player> getPlayers() {
         return gamePlayers.stream().map(sub -> sub.getPlayer()).collect(toList());
     }
+
     public void AddScore(Score score) {
         score.setGame(this);
         scores.add(score);
@@ -63,6 +67,7 @@ public class Game {
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
+
     @JsonIgnore
     public Set<GamePlayer> getGamePlayers() {
         return gamePlayers;

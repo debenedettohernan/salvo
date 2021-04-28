@@ -52,9 +52,9 @@ public class SalvoApplication extends SpringBootServletInitializer {
             Game game6 = new Game(LocalDateTime.now());
 
             Player player1 = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
-            Player player2 = new Player("j.bauer@ctu.gov",passwordEncoder.encode("24"));
-            Player player3 = new Player("c.obrian@ctu.gov",passwordEncoder.encode("42"));
-            Player player4 = new Player("kim_bauer@gmail.com",passwordEncoder.encode("kb"));
+            Player player2 = new Player("j.bauer@ctu.gov", passwordEncoder.encode("24"));
+            Player player3 = new Player("c.obrian@ctu.gov", passwordEncoder.encode("42"));
+            Player player4 = new Player("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
             Player player5 = new Player("hernan.debenedetto@gmail.com", passwordEncoder.encode("hernan"));
 
             GamePlayer gamePlayer1 = new GamePlayer(LocalDateTime.now(), game1, player1);
@@ -123,19 +123,16 @@ public class SalvoApplication extends SpringBootServletInitializer {
             Salvo salvo22 = new Salvo(2, gamePlayer11, Set.of("A5", "B6", "C8"));
 
 
-
-            Score score1 = new Score(LocalDateTime.now(),game1,player1, 0.0);
-            Score score2 = new Score(LocalDateTime.now(),game1,player2, 1.0);
-            Score score3 = new Score(LocalDateTime.now(),game2,player3, 0.5);
-            Score score4 = new Score(LocalDateTime.now(),game2,player4, 0.5);
-            Score score5 = new Score(LocalDateTime.now(),game3,player5, 1.0);
-            Score score6 = new Score(LocalDateTime.now(),game3,player1, 0.0);
-            Score score7 = new Score(LocalDateTime.now(),game4,player2, 0.5);
-            Score score8 = new Score(LocalDateTime.now(),game4,player1, 0.5);
-            Score score9 = new Score(LocalDateTime.now(),game5,player5, 1.0);
-            Score score10 = new Score(LocalDateTime.now(),game5,player3, 0.0);
-
-
+            Score score1 = new Score(LocalDateTime.now(), game1, player1, 0.0);
+            Score score2 = new Score(LocalDateTime.now(), game1, player2, 1.0);
+            Score score3 = new Score(LocalDateTime.now(), game2, player3, 0.5);
+            Score score4 = new Score(LocalDateTime.now(), game2, player4, 0.5);
+            Score score5 = new Score(LocalDateTime.now(), game3, player5, 1.0);
+            Score score6 = new Score(LocalDateTime.now(), game3, player1, 0.0);
+            Score score7 = new Score(LocalDateTime.now(), game4, player2, 0.5);
+            Score score8 = new Score(LocalDateTime.now(), game4, player1, 0.5);
+            Score score9 = new Score(LocalDateTime.now(), game5, player5, 1.0);
+            Score score10 = new Score(LocalDateTime.now(), game5, player3, 0.0);
 
 
             repositoryPlayer.save(player1);
@@ -228,6 +225,7 @@ public class SalvoApplication extends SpringBootServletInitializer {
     }
 
 }
+
 @Configuration
 class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
@@ -241,7 +239,7 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
     @Override
     public void init(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(inputName-> {
+        auth.userDetailsService(inputName -> {
             Player player = playerRepository.findByUserName(inputName);
             if (player != null) {
                 return new User(player.getUserName(), player.getPassword(),
@@ -260,7 +258,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/web/game.html", "/api/game_view/**", "/rest/**","/h2-console").hasAuthority("USER")
+                .antMatchers("/web/game.html", "/api/game_view/**", "/rest/**", "/h2-console").hasAuthority("USER")
                 .antMatchers("/**").permitAll();
         http.formLogin()
                 .usernameParameter("username")

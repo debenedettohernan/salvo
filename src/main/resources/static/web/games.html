@@ -27,6 +27,7 @@
         <div v-if="player !=null ">
             <h1>Welcome {{player.name}}</h1>
             <button v-on:click=" logOut " type="button " class="btn btn-primary col-1 ">Log out</button>
+            <button v-on:click="createGame" type="button" class="btn btn-primary col-1">Create Game</button>
 
         </div>
         <div class="row ">
@@ -35,7 +36,10 @@
                 <ul v-for="game in games ">
                     <li> <strong>{{game.date}} </strong>
                         <ul>
-                            <li v-for="games in game.gamePlayers "> <strong>{{games.player.name}} </strong></li>
+                            <li v-for="gamePlayer in game.gamePlayers ">
+                                <span v-if="player != null && player.id == gamePlayer.player.id"><a v-bind:href="'game.html?gp=' + gamePlayer.id">{{gamePlayer.player.name}}</a> </span>
+                                <span v-else>{{gamePlayer.player.name}}</span>
+                            </li>
                         </ul>
                     </li>
                 </ul>

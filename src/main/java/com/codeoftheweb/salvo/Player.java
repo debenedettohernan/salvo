@@ -1,6 +1,7 @@
 package com.codeoftheweb.salvo;
 
 import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.*;
@@ -48,8 +49,8 @@ public class Player {
         scores.add(score);
     }
 
-    public Optional<Score> getScore(Game game){
-        return  scores.stream().filter(p -> p.getGame().equals(game)).findFirst();
+    public Optional<Score> getScore(Game game) {
+        return scores.stream().filter(p -> p.getGame().equals(game)).findFirst();
     }
 
     public List<Game> getGames() {
