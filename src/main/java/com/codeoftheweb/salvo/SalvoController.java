@@ -74,13 +74,40 @@ public class SalvoController {
 
             gamePlayerRepository.save(gamePlayer);
 
-            return new ResponseEntity<>(makeMap("gpId",gamePlayer.getId()),HttpStatus.CREATED);
+            return new ResponseEntity<>(makeMap("gpId", gamePlayer.getId()), HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(makeMap("error", "You must log in with your account to create a game"), HttpStatus.FORBIDDEN);
         }
     }
-    @PostMapping("/games/nn/players")
-    public ResponseEntity<Map<String, Object>> 
+
+    @PostMapping("/games/{gameId}/players")
+    public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long gameId, Authentication authentication) {
+        if (!isGuest(authentication)) {
+            Player authenticationPlayer = playerRepository.findByUserName(authentication.getName());
+
+            Optional<Game> game = gameRepository.findById(gameId);
+
+            if (game.isEmpty()) {
+
+                return new ResponseEntity<>(makeMap("error", "No existe tal juego"), HttpStatus.FORBIDDEN);
+            } else {
+                if (game.get().getGamePlayers().size() == 1 ) {
+
+                    GamePlayer gamePlayer = new GamePlayer(LocalDateTime.now(), game.get(), authenticationPlayer);
+
+                    gamePlayerRepository.save(gamePlayer);
+
+                    return new ResponseEntity<>(makeMap("gpId", gamePlayer.getId()), HttpStatus.CREATED);
+                } else {
+
+                    return new ResponseEntity<>(makeMap("error", "El juego esta lleno"), HttpStatus.FORBIDDEN);
+                }
+            }
+
+        } else {
+            return new ResponseEntity<>(makeMap("error", "no estas identificado"), HttpStatus.UNAUTHORIZED);
+        }
+    }
 
     @GetMapping("/gamePlayers")
     public Set<Map<String, Object>> getGamePlayers() {
@@ -88,13 +115,14 @@ public class SalvoController {
     }
 
     @GetMapping("/game_view/{gamePlayerId}")
-    public ResponseEntity<Map<String, Object>> gameView(@PathVariable Long gamePlayerId, Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> gameView(@PathVariable Long gamePlayerId, Authentication
+            authentication) {
 
         if (isGuest(authentication)) {
             return new ResponseEntity<>(makeMap("error", "You must log in with your account to play"), HttpStatus.UNAUTHORIZED);
         } else {
             Optional<GamePlayer> gamePlayer = gamePlayerRepository.findById(gamePlayerId);
-            Player player = playerRepository.findByUserName(    authentication.getName());
+            Player player = playerRepository.findByUserName(authentication.getName());
             if (gamePlayer.isEmpty()) {
                 return new ResponseEntity<>(makeMap("error", "The game does not exist"), HttpStatus.NOT_FOUND);
             } else if (gamePlayer.get().getPlayer().getId() != player.getId()) {
