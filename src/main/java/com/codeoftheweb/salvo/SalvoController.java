@@ -89,23 +89,31 @@ public class SalvoController {
 
             if (game.isEmpty()) {
 
-                return new ResponseEntity<>(makeMap("error", "No existe tal juego"), HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(makeMap("error", "There is no such game"), HttpStatus.FORBIDDEN);
             } else {
-                if (game.get().getGamePlayers().size() == 1 ) {
+                if (game.get().getGamePlayers().size() == 1) {
 
-                    GamePlayer gamePlayer = new GamePlayer(LocalDateTime.now(), game.get(), authenticationPlayer);
 
-                    gamePlayerRepository.save(gamePlayer);
+                    if (game.get().getGamePlayers().stream().anyMatch(gamePlayer1 -> gamePlayer1.getPlayer().getId() != authenticationPlayer.getId())) {
 
-                    return new ResponseEntity<>(makeMap("gpId", gamePlayer.getId()), HttpStatus.CREATED);
+                        GamePlayer gamePlayer = new GamePlayer(LocalDateTime.now(), game.get(), authenticationPlayer);
+
+                        gamePlayerRepository.save(gamePlayer);
+
+                        return new ResponseEntity<>(makeMap("gpId", gamePlayer.getId()), HttpStatus.CREATED);
+                    } else {
+                        return new ResponseEntity<>(makeMap("error", "You cannot enter the game that you created yourself"), HttpStatus.FORBIDDEN);
+                    }
+
+
                 } else {
 
-                    return new ResponseEntity<>(makeMap("error", "El juego esta lleno"), HttpStatus.FORBIDDEN);
+                    return new ResponseEntity<>(makeMap("error", "The game is full"), HttpStatus.UNAUTHORIZED);
                 }
             }
 
         } else {
-            return new ResponseEntity<>(makeMap("error", "no estas identificado"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(makeMap("error", "You are not identified"), HttpStatus.UNAUTHORIZED);
         }
     }
 

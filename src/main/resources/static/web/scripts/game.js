@@ -5,10 +5,9 @@ var app = new Vue({
         letras: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
         numeros: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
         r: ["r"],
-        player: {
-            player1: {},
-            player2: {},
-        }
+        player1: {},
+        player2: {},
+
 
     },
     methods: {
@@ -24,18 +23,18 @@ var app = new Vue({
         },
         pantallaJugador: function() {
             for (var i = 0; i < app.games.gamePlayers.length; i++) {
-                if (app.games.gamePlayers[i].player.id == gameViewParam) {
-                    app.player.player1 = app.games.gamePlayers[i].player
+                if (app.games.gamePlayers[i].id == gameViewParam) {
+                    app.player1 = app.games.gamePlayers[i].player
                 } else {
-                    app.player.player2 = app.games.gamePlayers[i].player
+                    app.player2 = app.games.gamePlayers[i].player
                 }
             }
         },
 
         ubicacionDisparos: function() {
 
-            var disparosPlayer1 = app.games.salvo.filter(slv => slv.player == app.player.player1.id)
-            var disparosPlayer2 = app.games.salvo.filter(slv => slv.player == app.player.player2.id)
+            var disparosPlayer1 = app.games.salvo.filter(slv => slv.player == app.player1.id)
+            var disparosPlayer2 = app.games.salvo.filter(slv => slv.player == app.player2.id)
 
             for (var i = 0; i < disparosPlayer1.length; i++) {
                 for (var j = 0; j < disparosPlayer1[i].locations.length; j++) {
@@ -53,7 +52,7 @@ var app = new Vue({
         },
 
         disparosAcertados: function() {
-            var disparosPlayer2 = app.games.salvo.filter(slv => slv.player == app.player.player2.id)
+            var disparosPlayer2 = app.games.salvo.filter(slv => slv.player == app.player2.id)
 
             for (i = 0; i < disparosPlayer2.length; i++) {
                 for (j = 0; j < disparosPlayer2[i].locations.length; j++) {
@@ -67,12 +66,13 @@ var app = new Vue({
                 }
             }
 
+
+
         }
 
     }
 })
 
-// ARREGLAR TODO PARA QUE LAS FUNCIONES QUEDEN EN METODOS Y CORREJIR COSAS PARA QUE LEA BIEN EL VUE 
 
 const urlParams = new URLSearchParams(window.location.search);
 const gameViewParam = urlParams.get('gp');
