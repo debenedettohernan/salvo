@@ -7,8 +7,6 @@ var app = new Vue({
         r: ["r"],
         player1: {},
         player2: {},
-
-
     },
     methods: {
         asignarUbicacion: function() {
@@ -30,7 +28,6 @@ var app = new Vue({
                 }
             }
         },
-
         ubicacionDisparos: function() {
 
             var disparosPlayer1 = app.games.salvo.filter(slv => slv.player == app.player1.id)
@@ -50,7 +47,6 @@ var app = new Vue({
                 }
             }
         },
-
         disparosAcertados: function() {
             var disparosPlayer2 = app.games.salvo.filter(slv => slv.player == app.player2.id)
 
@@ -65,9 +61,6 @@ var app = new Vue({
                     }
                 }
             }
-
-
-
         }
 
     }

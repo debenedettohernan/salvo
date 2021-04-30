@@ -1,13 +1,11 @@
 package com.codeoftheweb.salvo;
 
-import com.sun.istack.ByteArrayDataSource;
-import org.apache.tomcat.jni.Local;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +43,6 @@ public class SalvoController {
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
-
     @RequestMapping("/games")
     public Map<String, Object> getAllGames(Authentication authentication) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -79,7 +76,6 @@ public class SalvoController {
             return new ResponseEntity<>(makeMap("error", "You must log in with your account to create a game"), HttpStatus.FORBIDDEN);
         }
     }
-
     @PostMapping("/games/{gameId}/players")
     public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long gameId, Authentication authentication) {
         if (!isGuest(authentication)) {
@@ -92,8 +88,6 @@ public class SalvoController {
                 return new ResponseEntity<>(makeMap("error", "There is no such game"), HttpStatus.FORBIDDEN);
             } else {
                 if (game.get().getGamePlayers().size() == 1) {
-
-
                     if (game.get().getGamePlayers().stream().anyMatch(gamePlayer1 -> gamePlayer1.getPlayer().getId() != authenticationPlayer.getId())) {
 
                         GamePlayer gamePlayer = new GamePlayer(LocalDateTime.now(), game.get(), authenticationPlayer);
@@ -104,28 +98,21 @@ public class SalvoController {
                     } else {
                         return new ResponseEntity<>(makeMap("error", "You cannot enter the game that you created yourself"), HttpStatus.FORBIDDEN);
                     }
-
-
                 } else {
-
                     return new ResponseEntity<>(makeMap("error", "The game is full"), HttpStatus.UNAUTHORIZED);
                 }
             }
-
         } else {
             return new ResponseEntity<>(makeMap("error", "You are not identified"), HttpStatus.UNAUTHORIZED);
         }
     }
-
     @GetMapping("/gamePlayers")
     public Set<Map<String, Object>> getGamePlayers() {
         return gamePlayerRepository.findAll().stream().map(this::gamePlayersDTO).collect(toSet());
     }
-
     @GetMapping("/game_view/{gamePlayerId}")
     public ResponseEntity<Map<String, Object>> gameView(@PathVariable Long gamePlayerId, Authentication
             authentication) {
-
         if (isGuest(authentication)) {
             return new ResponseEntity<>(makeMap("error", "You must log in with your account to play"), HttpStatus.UNAUTHORIZED);
         } else {
@@ -136,7 +123,6 @@ public class SalvoController {
             } else if (gamePlayer.get().getPlayer().getId() != player.getId()) {
                 return new ResponseEntity<>(makeMap("error", "You can only see your ships"), HttpStatus.FORBIDDEN);
             }
-
             return new ResponseEntity<>(gameViewDTO(gamePlayer.get()), HttpStatus.OK);
         }
     }
@@ -144,32 +130,24 @@ public class SalvoController {
     @PostMapping("/players")
     public ResponseEntity<Object> register(
             @RequestParam String username, @RequestParam String password) {
-
-
         if (username.isEmpty() || password.isEmpty()) {
             return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
         }
-
         if (playerRepository.findByUserName(username) != null) {
             return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
         }
-
         playerRepository.save(new Player(username, passwordEncoder.encode(password)));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
     @GetMapping("/players")
     public List<Map<String, Object>> getPlayer() {
         return playerRepository.findAll().stream().map(this::playersDTO).collect(Collectors.toList());
     }
-
-
     public Map<String, Object> gameDTO(Game game) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", game.getId());
         dto.put("date", game.getCreationDate());
         dto.put("gamePlayers", game.getGamePlayers().stream().map(this::gamePlayersDTO).collect(toSet()));
-
         return dto;
     }
 
@@ -177,7 +155,6 @@ public class SalvoController {
         Map<String, Object> dtoPlayer = new LinkedHashMap<String, Object>();
         dtoPlayer.put("id", player.getId());
         dtoPlayer.put("name", player.getUserName());
-
         return dtoPlayer;
     }
 
@@ -186,7 +163,6 @@ public class SalvoController {
         dtoGamePlayer.put("id", gamePlayer.getId());
         dtoGamePlayer.put("player", playersDTO(gamePlayer.getPlayer()));
         dtoGamePlayer.put("score", gamePlayer.getScore().map(Score::getScore).orElse(null));
-
         return dtoGamePlayer;
     }
 
@@ -194,7 +170,6 @@ public class SalvoController {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("type", ship.getTypeShips());
         dto.put("locations", ship.getLocation());
-
         return dto;
     }
 
@@ -203,8 +178,6 @@ public class SalvoController {
         dto.put("turn", salvo.getTurn());
         dto.put("player", salvo.getGamePlayer().getPlayer().getId());
         dto.put("locations", salvo.getSalvoLocation());
-
-
         return dto;
     }
 
@@ -215,7 +188,6 @@ public class SalvoController {
         dto.put("gamePlayers", gamePlayer.getGame().getGamePlayers().stream().map(this::gamePlayersDTO).collect(toSet()));
         dto.put("ships", gamePlayer.getShips().stream().map(this::shipDTO).collect(toSet()));
         dto.put("salvo", gamePlayer.getGame().getGamePlayers().stream().flatMap(i -> i.getSalvos().stream().map(this::salvoDTO)).collect(toSet()));
-
         return dto;
     }
 
@@ -224,6 +196,4 @@ public class SalvoController {
         map.put(key, value);
         return map;
     }
-
-
 }

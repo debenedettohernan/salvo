@@ -13,18 +13,14 @@ var app = new Vue({
             var players = [];
             app.games.forEach(game => {
                 game.gamePlayers.forEach(gamePlayer => {
-
                     if (!players.includes(gamePlayer.player.name)) {
                         players.push(gamePlayer.player.name)
                     }
-
                 })
             });
             return players;
 
         },
-
-
         totalScore: function(name) {
             var total = 0
             app.games.forEach(game =>
@@ -35,22 +31,17 @@ var app = new Vue({
 
                 }))
             return total;
-
         },
-
         totalWins: function(name) {
             var wins = 0
             app.games.forEach(game =>
                 game.gamePlayers.forEach(gamePlayer => {
-
                     if (name == gamePlayer.player.name) {
                         wins += gamePlayer.score == 1
                     }
                 }))
             return wins;
-
         },
-
         totalTies: function(name) {
             var ties = 0.0
             app.games.forEach(game =>
@@ -62,7 +53,6 @@ var app = new Vue({
                 }))
             return ties;
         },
-
         totalLosses: function(name) {
             var losses = 0
             app.games.forEach(game =>
@@ -74,8 +64,6 @@ var app = new Vue({
                 }))
             return losses;
         },
-
-
         tablaScore: function() {
             var scorePlayer = []
             var totalPlayers = app.players()
@@ -92,15 +80,11 @@ var app = new Vue({
                     winScore: win,
                     tiesScore: ties,
                     lossesScore: losses
-
                 }
-
                 app.scorePlayers.push(scorePlayer)
             })
-
         },
         logIn: function() {
-
             $.post("/api/login", {
                     username: app.username,
                     password: app.password
