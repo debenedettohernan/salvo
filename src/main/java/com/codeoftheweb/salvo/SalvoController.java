@@ -143,6 +143,8 @@ public class SalvoController {
     public List<Map<String, Object>> getPlayer() {
         return playerRepository.findAll().stream().map(this::playersDTO).collect(Collectors.toList());
     }
+
+
     public Map<String, Object> gameDTO(Game game) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", game.getId());
