@@ -2,6 +2,7 @@ package com.codeoftheweb.salvo;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -43,6 +44,7 @@ public class SalvoController {
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
+
     @RequestMapping("/games")
     public Map<String, Object> getAllGames(Authentication authentication) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -76,6 +78,7 @@ public class SalvoController {
             return new ResponseEntity<>(makeMap("error", "You must log in with your account to create a game"), HttpStatus.FORBIDDEN);
         }
     }
+
     @PostMapping("/games/{gameId}/players")
     public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long gameId, Authentication authentication) {
         if (!isGuest(authentication)) {
@@ -106,10 +109,40 @@ public class SalvoController {
             return new ResponseEntity<>(makeMap("error", "You are not identified"), HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @PostMapping("/games/players/{gamePlayerId}/ships")
+    public ResponseEntity<Map<String, Object>> saveShips(@PathVariable Long gamePlayerId, @RequestBody Set<Ship> ships, Authentication authentication) {
+        if (isGuest(authentication)) {
+            return new ResponseEntity<>(makeMap("error", "No estas logeado"), HttpStatus.UNAUTHORIZED);
+        } else {
+            Optional<GamePlayer> gpId = gamePlayerRepository.findById(gamePlayerId);
+            Player authenticationPlayer = playerRepository.findByUserName(authentication.getName());
+            if (gpId.isEmpty()) {
+                return new ResponseEntity<>(makeMap("error", "no se puede encontrar el gameplayer solicitado"), HttpStatus.NOT_FOUND);
+            } else if (gpId.get().getPlayer().getId() != authenticationPlayer.getId()) {
+                return new ResponseEntity<>(makeMap("error", "el juego no corresponde al jugador"), HttpStatus.UNAUTHORIZED);
+            } else if (gpId.get().getShips().size() > 0) {
+                return new ResponseEntity<>(makeMap("error", " usted ya puso sus naves "), HttpStatus.FORBIDDEN);
+            } else if (ships.size() != 5) {
+                return new ResponseEntity<>(makeMap("error", "no puedes tener una cantidad distinta a 5 barcos"), HttpStatus.FORBIDDEN);
+            } else {
+                for (Ship ship : ships) {
+                    gpId.get().AddShip(ship);
+
+                }
+                gamePlayerRepository.save(gpId.get());
+                return new ResponseEntity<>(makeMap("bien", "lograste ubicar tus naves perfectamente"), HttpStatus.CREATED);
+            }
+
+        }
+
+    }
+
     @GetMapping("/gamePlayers")
     public Set<Map<String, Object>> getGamePlayers() {
         return gamePlayerRepository.findAll().stream().map(this::gamePlayersDTO).collect(toSet());
     }
+
     @GetMapping("/game_view/{gamePlayerId}")
     public ResponseEntity<Map<String, Object>> gameView(@PathVariable Long gamePlayerId, Authentication
             authentication) {
@@ -139,6 +172,7 @@ public class SalvoController {
         playerRepository.save(new Player(username, passwordEncoder.encode(password)));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
     @GetMapping("/players")
     public List<Map<String, Object>> getPlayer() {
         return playerRepository.findAll().stream().map(this::playersDTO).collect(Collectors.toList());

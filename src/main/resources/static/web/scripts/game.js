@@ -61,6 +61,18 @@ var app = new Vue({
                     }
                 }
             }
+        },
+        jsonWithShips: function() {
+            var shipsGp = [];
+
+            for (i = 0; i < app.games.ships.length; i++) {
+                shipsGp.push({
+                    "type": app.games.ships[i].type,
+                    "locations": app.games.ships[i].locations
+                })
+            }
+            return shipsGp;
+
         }
 
     }
