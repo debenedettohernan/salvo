@@ -7,6 +7,7 @@ var app = new Vue({
         r: ["r"],
         player1: {},
         player2: {},
+        shipsGp: [],
     },
     methods: {
         asignarUbicacion: function() {
@@ -63,18 +64,37 @@ var app = new Vue({
             }
         },
         jsonWithShips: function() {
-            var shipsGp = [];
-
             for (i = 0; i < app.games.ships.length; i++) {
-                shipsGp.push({
+                app.shipsGp.push({
                     "type": app.games.ships[i].type,
                     "locations": app.games.ships[i].locations
+
                 })
             }
-            return shipsGp;
 
+        },
+        postShips: function() {
+            $.post({
+                    url: "/api/games/players/" + gameViewParam + "/ships",
+                    data: JSON.stringify(
+                        [
+                            { "typeShips": "Destroyer", "location": ["A1", "B1", "C1"] },
+                            { "typeShips": "Carrier", "location": ["I5", "I6"] },
+                            { "typeShips": "Submarine", "location": ["F8", "F9", "F10"] },
+                            { "typeShips": "Battleship", "location": ["A6", "B6", "C6", "D6"] },
+                            { "typeShips": "Patrol Boat", "location": ["H5", "H6"] }
+                        ]
+                    ),
+                    dataType: "text",
+                    contentType: "application/json"
+                })
+                .done(function() {
+                    alert("ships added"), location.reload();
+                })
+                .fail(function(jqXHR, status, httpError) {
+                    alert("Failed to add pet: " + textStatus + " " + httpError);
+                })
         }
-
     }
 })
 
@@ -93,5 +113,6 @@ fetch('http://localhost:8080/api/game_view/' + gameViewParam)
         app.pantallaJugador();
         app.ubicacionDisparos();
         app.disparosAcertados();
+        app.jsonWithShips();
 
     })
