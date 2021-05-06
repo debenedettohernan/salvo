@@ -50,7 +50,24 @@
                 </table>
             </div>
             <div>
+                <div class="btn-group">
+                    <select class="form-select" aria-label="Default select example">
+                        <option selected>Select your ships</option>
+                        <option v-for="naves in typeShips">{{naves.type}}</option>
+                      </select>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked>
+                    <label class="form-check-label" for="inlineRadio1">Vertical</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                    <label class="form-check-label" for="inlineRadio2">Horizontal</label>
+                </div>
+            </div>
+            <div>
                 <button v-on:click="postShips" type="button" class="btn btn-primary col-2">Añadir naves</button>
+                <button class="btn btn-primary col-2" type="button" value="Página anterior" onClick="history.go(-1);">Volver atras</button>
             </div>
 
             <footer></footer>
