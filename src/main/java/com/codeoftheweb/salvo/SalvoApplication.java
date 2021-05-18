@@ -100,7 +100,7 @@ public class SalvoApplication extends SpringBootServletInitializer {
             Ship ship25 = new Ship("Patrol Boat", gamePlayer5, List.of("C7", "C8"));
 
             Salvo salvo1 = new Salvo(1, gamePlayer1, Set.of("B5", "C5", "F1"));
-            Salvo salvo2 = new Salvo(2, gamePlayer1, Set.of("F2", "D5"));
+            Salvo salvo2 = new Salvo(2, gamePlayer1, Set.of("F2", "D5", "D6"));
             Salvo salvo3 = new Salvo(1, gamePlayer2, Set.of("B4", "B5", "B6"));
             Salvo salvo4 = new Salvo(2, gamePlayer2, Set.of("E1", "H3", "A2"));
             Salvo salvo5 = new Salvo(1, gamePlayer3, Set.of("G6", "H6", "A4"));

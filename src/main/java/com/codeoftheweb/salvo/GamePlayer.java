@@ -50,6 +50,11 @@ public class GamePlayer {
         ships.add(ship);
     }
 
+    public void AddSalvoes(Salvo salvo) {
+        salvo.setGamePlayer(this);
+        salvos.add(salvo);
+    }
+
     public Optional<Score> getScore() {
         return player.getScore(this.game);
     }

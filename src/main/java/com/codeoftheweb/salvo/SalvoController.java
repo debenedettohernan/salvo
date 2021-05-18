@@ -138,6 +138,39 @@ public class SalvoController {
 
     }
 
+    @PostMapping ("/games/players/{gamePlayerId}/salvoes")
+    public ResponseEntity<Map<String, Object>> saveSalvoes(@PathVariable Long gamePlayerId, @RequestBody Salvo salvo, Authentication authentication){
+        if (isGuest(authentication)) {
+            return new ResponseEntity<>(makeMap("error", "No estas logeado"), HttpStatus.UNAUTHORIZED);
+        }else{
+            Optional<GamePlayer> gpId = gamePlayerRepository.findById(gamePlayerId);
+            Player authenticationPlayer = playerRepository.findByUserName(authentication.getName());
+            if (gpId.isEmpty()) {
+                return new ResponseEntity<>(makeMap("error", "no se puede encontrar el gameplayer solicitado"), HttpStatus.NOT_FOUND);
+            }else if (gpId.get().getPlayer().getId() != authenticationPlayer.getId()) {
+                return new ResponseEntity<>(makeMap("error", "el juego no corresponde al jugador"), HttpStatus.UNAUTHORIZED);
+            }else if (salvo.getSalvoLocation().size() > 5 ) {
+                return new ResponseEntity<>(makeMap("error", "no puedes enviar mas de 5 disparos "), HttpStatus.FORBIDDEN);
+            }else if(gpId.get().getSalvos().size() == salvo.getTurn()){
+                return new ResponseEntity<>(makeMap("error", "no puedes disparar mas de un salvo en tu turno"), HttpStatus.FORBIDDEN);
+            }else if (gpId.get().getSalvos().size() +1 != salvo.getTurn()) {
+                return new ResponseEntity<>(makeMap("error", "no puedes saltear turnos"), HttpStatus.FORBIDDEN);
+            }
+            else {
+                Optional<GamePlayer> player2 = gpId.get().getGame().getGamePlayers().stream().filter(gamePlayer -> gamePlayer.getId() != gpId.get().getId()).findFirst();
+                if(player2.isPresent()){
+                    if(gpId.get().getSalvos().size() - player2.get().getSalvos().size() >= 1) {
+                        return new ResponseEntity<>(makeMap("error", "no te podes robarle turnos a tu oponente"), HttpStatus.FORBIDDEN);
+                    }
+                    Salvo salvoe = new Salvo(salvo.getTurn(),gpId.get(),salvo.getSalvoLocation());
+                    salvoRepository.save(salvoe);
+                    return new ResponseEntity<>(makeMap("bien", "realizaste tus disparon"), HttpStatus.CREATED);
+                }else{
+                    return new ResponseEntity<>(makeMap("error","el oponente no existe"), HttpStatus.NOT_FOUND);
+                }
+            }
+    }}
+
     @GetMapping("/gamePlayers")
     public Set<Map<String, Object>> getGamePlayers() {
         return gamePlayerRepository.findAll().stream().map(this::gamePlayersDTO).collect(toSet());
