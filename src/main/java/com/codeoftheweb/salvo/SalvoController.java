@@ -257,8 +257,26 @@ public class SalvoController {
         dto.put("gamePlayers", gamePlayer.getGame().getGamePlayers().stream().map(this::gamePlayersDTO).collect(toSet()));
         dto.put("ships", gamePlayer.getShips().stream().map(this::shipDTO).collect(toSet()));
         dto.put("salvo", gamePlayer.getGame().getGamePlayers().stream().flatMap(i -> i.getSalvos().stream().map(this::salvoDTO)).collect(toSet()));
+        dto.put("hitsSalvoP1", gamePlayer.getSalvos().stream().map(this::hitsDTO).collect(toSet()));
+        dto.put("sunkShipsP2", gamePlayer.getSalvos().stream().map(this::sunksDTO).collect(toSet()));
+        dto.put("hitsSalvoP2", gamePlayer.getGame().getGamePlayers().stream().filter(player -> player.getId() != gamePlayer.getId()).flatMap(player -> player.getSalvos().stream().map(this::hitsDTO)).collect(toSet()));
+        dto.put("sunkShipsP1",  gamePlayer.getGame().getGamePlayers().stream().filter(player -> player.getId() != gamePlayer.getId()).flatMap(player -> player.getSalvos().stream().map(this::sunksDTO)).collect(toSet()));
         return dto;
     }
+    public Map<String,Object> hitsDTO (Salvo salvo) {
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("turn", salvo.getTurn());
+        dto.put("hitsOnShips", salvo.getHits());
+        return dto;
+    }
+
+    public Map<String,Object> sunksDTO (Salvo salvo) {
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("turn", salvo.getTurn());
+        dto.put("sunkShips",salvo.getSunks().stream().map(this::shipDTO));
+        return dto;
+    }
+
     private Map<String, Object> makeMap(String key, Object value) {
         Map<String, Object> map = new HashMap<>();
         map.put(key, value);

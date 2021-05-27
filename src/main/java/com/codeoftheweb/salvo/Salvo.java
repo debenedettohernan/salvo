@@ -4,7 +4,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Salvo {
@@ -66,4 +68,28 @@ public class Salvo {
         this.salvoLocation = salvoLocation;
     }
 
+    public Optional<GamePlayer> getPlayer2(){
+        Optional<GamePlayer> player2 = gamePlayer.getGame().getGamePlayers().stream().filter(player -> player.getId() != gamePlayer.getId()).findFirst();
+        return player2;
+    }
+
+    public Set<String> getHits(){
+        Set<String> totalHits = new HashSet<>();
+        if(getPlayer2().isPresent()){
+            Set<String> locationsShips = getPlayer2().get().getShips().stream().flatMap(ship -> ship.getLocation().stream()).collect(Collectors.toSet());
+           locationsShips.retainAll(salvoLocation);
+            totalHits = locationsShips;
+        }
+        return totalHits;
+    }
+    public Set<Ship> getSunks() {
+        Set<Ship> shipSunks = new HashSet<>();
+        Set<String> hitsLocacion = gamePlayer.getSalvos().stream().filter(salvo -> salvo.turn <= this.getTurn()).flatMap(salvoHit -> salvoHit.getHits().stream()).collect(Collectors.toSet());
+        if (getPlayer2().isPresent()) {
+
+            shipSunks = getPlayer2().get().getShips().stream().filter(ship -> hitsLocacion.containsAll(ship.getLocation())).collect(Collectors.toSet());
+        }
+
+        return shipSunks;
+    }
 }

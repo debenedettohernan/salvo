@@ -20,9 +20,12 @@ var app = new Vue({
         shipClient: [],
         allSalvoes: [],
         salvoesClient: {
-            turn: 1,
+            turn: 0,
             salvoLocation: []
-        }
+        },
+        hits: [],
+        sunkShip1: [],
+        sunkShip2: [],
     },
     methods: {
         asignarUbicacion: function() {
@@ -77,6 +80,8 @@ var app = new Vue({
                     }
                 }
             }
+
+
         },
         postShips: function() {
             $.post({
@@ -167,16 +172,17 @@ var app = new Vue({
             app.shipClient = []
         },
         sendSalvo: function(letra, numero) {
-            var turn = app.games.salvo.length + 1
+            var turn = app.games.salvo.filter(el => el.player == app.player1.id).length + 1
             var salvoLocation = letra + numero
+            var salvoWithId = app.games.salvo.filter(el => el.player == app.player1.id)
 
-            if (!app.allSalvoes.includes(salvoLocation) && app.salvoesClient.salvoLocation.length <= 4 && !app.games.salvo.some(x => x.locations.includes(salvoLocation))) {
+            if (!app.allSalvoes.includes(salvoLocation) && app.salvoesClient.salvoLocation.length <= 4 && !salvoWithId.some(x => x.locations.includes(salvoLocation))) {
                 document.getElementById(salvoLocation + "r").className = "fire1";
                 app.salvoesClient.salvoLocation.push(salvoLocation)
                 app.salvoesClient.turn = turn
                 app.allSalvoes.push(salvoLocation)
-                console.log(app.player1.id)
             }
+
         },
         removeSalvo: function() {
             for (i = 0; i < app.salvoesClient.salvoLocation.length; i++) {
@@ -185,6 +191,24 @@ var app = new Vue({
             app.allSalvoes = []
             app.salvoesClient.salvoLocation = []
 
+        },
+        sunkShip: function() {
+            for (i = 0; i < app.games.sunkShipsP1.length; i++) {
+                for (o = 0; o < app.games.sunkShipsP1[i].sunkShips.length; o++) {
+                    if (!app.sunkShip1.includes(app.games.sunkShipsP1[i].sunkShips[o].type))
+                        app.sunkShip1.push(app.games.sunkShipsP1[i].sunkShips[o].type)
+                }
+            }
+
+            for (i = 0; i < app.games.sunkShipsP2.length; i++) {
+                for (o = 0; o < app.games.sunkShipsP2[i].sunkShips.length; o++) {
+                    if (!app.sunkShip2.includes(app.games.sunkShipsP2[i].sunkShips[o].type))
+                        app.sunkShip2.push(app.games.sunkShipsP2[i].sunkShips[o].type)
+
+
+
+                }
+            }
         }
     }
 })
@@ -204,5 +228,6 @@ fetch('http://localhost:8080/api/game_view/' + gameViewParam)
         app.pantallaJugador();
         app.ubicacionDisparos();
         app.disparosAcertados();
+        app.sunkShip();
 
     })

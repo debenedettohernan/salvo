@@ -12,7 +12,8 @@
 <div id="app" class="container">
 
     <nav>
-        <button class="btn btn-primary " type="button" value="Página anterior" onClick="history.go(-1);">Back to games</button>
+        <button class="btn btn-primary " type="button" value="Página anterior" onClick="history.go(-1);">Back to
+            games</button>
     </nav>
     <!--para no olvidar la cabecera-->
     <div class="row">
@@ -36,6 +37,42 @@
                         </tr>
                     </tbody>
                 </table>
+                <div v-if='games.ships == 0' class="btn-group">
+                    <select v-model:value="shipSelected" class="form-select" aria-label="Default select example">
+                        <option v-bind:value="ship" v-for="ship in shipWithLength">{{ship.typeShip}}</option>
+                    </select>
+
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" v-model:value="selectOrientation" value="vertical" checked>
+                        <label class="form-check-label" for="inlineRadio1">Vertical</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" v-model:value="selectOrientation" value="horizontal">
+                        <label class="form-check-label" for="inlineRadio2">Horizontal</label>
+                    </div>
+                </div>
+                <button v-if='shipClient.length == 5' v-on:click="postShips" type="button" class="btn btn-success ">Add
+                    ships</button>
+                <button v-if='shipClient != ""' v-on:click="removeShip" type="button" class="btn btn-danger ">Remove
+                    ships</button>
+                <button v-if='shipClient.length < 2' class="btn btn-info  " type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">How to play</button>
+                <table class="table table-sm table-borderless table-dark">
+                    <thead>
+                        <tr>
+                            <th class="text-center" scope="col" colspan="2">Sunken Ships</th>
+                        </tr>
+                        <tr>
+                            <th>You</th>
+                            <th>Oponnent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td v-for="nave in sunkShip1">{{nave}}</td>
+                            <td v-for="nave2 in sunkShip2">{{nave2}}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="col-6">
                 <table class="table table-dark table-bordered border-primary tables">
@@ -50,28 +87,16 @@
                         </tr>
                     </tbody>
                 </table>
-                <button v-on:click="postSalvo" type="button" class="btn btn-success ">fire!!</button>
-                <button v-if="salvoesClient !='' " v-on:click="removeSalvo" type="button" class="btn btn-danger ">remove fires</button>
+                <template v-if="games.ships != 0">
+                    <button v-on:click="postSalvo" type="button" class="btn btn-success ">fire!!</button>
+                    <button v-if="salvoesClient !='' " v-on:click="removeSalvo" type="button"
+                        class="btn btn-danger ">remove fires</button>
+                </template>
             </div>
-            <div v-if='games.ships == 0'>
-                <div class="btn-group">
-                    <select v-model:value="shipSelected" class="form-select" aria-label="Default select example"> 
-                        <option v-bind:value="ship" v-for="ship in shipWithLength">{{ship.typeShip}}</option>
-                      </select>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" v-model:value="selectOrientation" value="vertical" checked>
-                    <label class="form-check-label" for="inlineRadio1">vertical</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" v-model:value="selectOrientation" value="horizontal">
-                    <label class="form-check-label" for="inlineRadio2">horizontal</label>
-                </div>
-            </div>
+
             <div>
-                <button v-if='shipClient.length == 5' v-on:click="postShips" type="button" class="btn btn-success ">Add ships</button>
-                <button v-if='shipClient != ""' v-on:click="removeShip" type="button" class="btn btn-danger ">Remove ships</button>
-                <button v-if='shipClient.length < 2' class="btn btn-info  " type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">How to play</button>
+
+
 
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
                     <div class="offcanvas-header">
