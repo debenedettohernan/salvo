@@ -13,16 +13,21 @@ body {
     background-size: cover;
 }
 
-
-/*disparo agua*/
-
 .fire1 {
-    background-color: maroon !important;
+    background-color: lightseagreen !important;
     background-image: url(https://www.blogdelfotografo.com/wp-content/uploads/2011/08/Fotografiar-una-Gota-de-Agua.jpg) i !important;
 }
 
+.fire2 {
+    background-color: maroon !important;
+    background-size: cover;
+}
+
+
+/*disparo agua*/
+
 .color {
-    background-color: aqua !important;
+    background-color: yellowgreen !important;
 }
 
 .tables {
@@ -44,4 +49,8 @@ div h1 {
 div img {
     position: relative;
     margin-left: 1%;
+}
+
+h3 {
+    color: navy;
 }

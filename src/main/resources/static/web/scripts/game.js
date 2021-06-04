@@ -1,3 +1,5 @@
+const urlParams = new URLSearchParams(window.location.search);
+const gameViewParam = urlParams.get('gp');
 var app = new Vue({
     el: '#app',
     data: {
@@ -28,6 +30,23 @@ var app = new Vue({
         sunkShip2: [],
     },
     methods: {
+        getData: function() {
+            fetch('http://localhost:8080/api/game_view/' + gameViewParam)
+                .then(function(respuesta) {
+                    return respuesta.json();
+                })
+                .then((data) => {
+
+                    this.games = data;
+                    this.asignarUbicacion();
+                    this.pantallaJugador();
+                    this.ubicacionDisparos();
+                    this.disparosAcertados();
+                    this.hitsShips();
+                    this.sunkShip();
+                    this.reload();
+                })
+        },
         asignarUbicacion: function() {
 
             var nave = app.games.ships
@@ -80,8 +99,6 @@ var app = new Vue({
                     }
                 }
             }
-
-
         },
         postShips: function() {
             $.post({
@@ -91,10 +108,10 @@ var app = new Vue({
                     contentType: "application/json"
                 })
                 .done(function() {
-                    alert("ships added"), location.reload();
+                    location.reload();
                 })
                 .fail(function(jqXHR, textStatus, httpError) {
-                    alert("Failed to add pet: " + textStatus + " " + httpError);
+                    alert("Failed to add ships: " + textStatus + " " + httpError);
                 })
         },
         postSalvo: function() {
@@ -105,7 +122,7 @@ var app = new Vue({
                     contentType: "application/json"
                 })
                 .done(function() {
-                    alert("fire!"), location.reload();
+                    location.reload();
                 })
                 .fail(function(jqXHR, textStatus, httpError) {
 
@@ -192,42 +209,41 @@ var app = new Vue({
             app.salvoesClient.salvoLocation = []
 
         },
-        sunkShip: function() {
-            for (i = 0; i < app.games.sunkShipsP1.length; i++) {
-                for (o = 0; o < app.games.sunkShipsP1[i].sunkShips.length; o++) {
-                    if (!app.sunkShip1.includes(app.games.sunkShipsP1[i].sunkShips[o].type))
-                        app.sunkShip1.push(app.games.sunkShipsP1[i].sunkShips[o].type)
+        hitsShips: function() {
+            for (i = 0; i < app.games.hitsSalvoP1.length; i++) {
+                for (j = 0; j < app.games.hitsSalvoP1[i].hitsOnShips.length; j++) {
+                    document.getElementById(app.games.hitsSalvoP1[i].hitsOnShips[j] + "r").className = "fire0";
                 }
             }
 
+        },
+        sunkShip: function() {
+            if (app.games.gamePlayers.length == 2) {
+                for (i = 0; i < app.games.sunkShipsP1.length; i++) {
+                    for (o = 0; o < app.games.sunkShipsP1[i].sunkShips.length; o++) {
+                        for (j = 0; j < app.games.sunkShipsP1[i].sunkShips[o].locations.length; j++) {
+                            document.getElementById(app.games.sunkShipsP1[i].sunkShips[o].locations[j]).className = "fire2";
+                        }
+                    }
+                }
+            }
             for (i = 0; i < app.games.sunkShipsP2.length; i++) {
                 for (o = 0; o < app.games.sunkShipsP2[i].sunkShips.length; o++) {
-                    if (!app.sunkShip2.includes(app.games.sunkShipsP2[i].sunkShips[o].type))
-                        app.sunkShip2.push(app.games.sunkShipsP2[i].sunkShips[o].type)
-
-
-
+                    for (j = 0; j < app.games.sunkShipsP2[i].sunkShips[o].locations.length; j++) {
+                        document.getElementById(app.games.sunkShipsP2[i].sunkShips[o].locations[j] + "r").className = "fire2";
+                    }
                 }
             }
-        }
+
+        },
+        reload: function() {
+            if (this.games.statusGame == "WAIT_OPPONENT" || this.games.statusGame == "WAIT_SALVO_OPPONENT" || this.games.statusGame == "PLACE_SHIPS" || this.games.statusGame == "PLACE_YOUR_SALVOS") {
+                setTimeout(this.getData, 2000)
+            }
+        },
+
+    },
+    mounted: function() {
+        this.getData();
     }
 })
-
-
-const urlParams = new URLSearchParams(window.location.search);
-const gameViewParam = urlParams.get('gp');
-
-fetch('http://localhost:8080/api/game_view/' + gameViewParam)
-    .then(function(respuesta) {
-        return respuesta.json();
-    })
-    .then(function(data) {
-
-        app.games = data;
-        app.asignarUbicacion();
-        app.pantallaJugador();
-        app.ubicacionDisparos();
-        app.disparosAcertados();
-        app.sunkShip();
-
-    })

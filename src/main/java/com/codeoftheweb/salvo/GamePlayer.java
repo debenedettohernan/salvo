@@ -4,10 +4,10 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
+
+import static java.util.stream.Collectors.toList;
 
 @Entity
 public class GamePlayer {
@@ -27,13 +27,12 @@ public class GamePlayer {
     @JoinColumn(name = "game_id")
     private Game game;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy ="gamePlayer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gamePlayer", cascade = CascadeType.ALL)
     private Set<Ship> ships = new HashSet<>();
 
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "gamePlayer", cascade = CascadeType.ALL)
     private Set<Salvo> salvos = new HashSet<>();
-
 
 
     public GamePlayer() {
@@ -119,5 +118,49 @@ public class GamePlayer {
     public int hashCode() {
         return Objects.hash(id, localDate);
     }
+
+
+    public GameStatus gameStatus() {
+        if (this.getShips().isEmpty()) {
+            return GameStatus.PLACE_SHIPS;
+        } else {
+            if (this.getPlayer2().isPresent()) {
+                if (this.getPlayer2().get().getShips().isEmpty()) {
+                    return GameStatus.WAIT_SHIP_OPPONENT;
+                } else {
+                    if (this.getSalvos().stream().noneMatch(em -> em.getTurn() == this.getSalvos().size())) {
+                        return GameStatus.PLACE_YOUR_SALVOS;
+                    } else {
+                        if (this.getPlayer2().get().getSalvos().stream().noneMatch(em -> em.getTurn() == this.getSalvos().size())) {
+                            return GameStatus.WAIT_SALVO_OPPONENT;
+                        } else if (this.getSalvos().size() == this.getPlayer2().get().getSalvos().size()) {
+                            List<Long> mySunks = this.getSalvos().stream().filter(x -> x.getTurn() == this.getSalvos().size()).flatMap(x -> x.getSunks().stream()).map(Ship::getId).collect(toList());
+                            List<Long> player2Sunks = this.getPlayer2().get().getSalvos().stream().filter(x -> x.getTurn() == this.getSalvos().size()).flatMap(x -> x.getSunks().stream()).map(Ship::getId).collect(toList());
+
+                            if (mySunks.size() == 5 && player2Sunks.size() == 5) {
+                                return GameStatus.TIE;
+                            } else if (mySunks.size() == 5) {
+                                return GameStatus.WIN;
+                            } else if (player2Sunks.size() == 5) {
+                                return GameStatus.LOSE;
+                            } else {
+                                return GameStatus.PLACE_YOUR_SALVOS;
+                            }
+                        } else {
+                            return GameStatus.PLACE_SALVOS;
+                        }
+                    }
+                }
+            } else {
+                return GameStatus.WAIT_OPPONENT;
+            }
+        }
+    }
+
+    public Optional<GamePlayer> getPlayer2() {
+        Optional<GamePlayer> player2 = this.getGame().getGamePlayers().stream().filter(player -> player.getId() != this.getId()).findFirst();
+        return player2;
+    }
+
 
 }

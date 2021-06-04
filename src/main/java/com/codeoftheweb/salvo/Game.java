@@ -28,7 +28,7 @@ public class Game {
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "game")
-    private List<Score> scores = new ArrayList<>();
+    private Set<Score> scores = new HashSet<>();
 
     public Game() {
     }
@@ -77,11 +77,11 @@ public class Game {
         this.gamePlayers = gamePlayers;
     }
 
-    public List<Score> getScores() {
+    public Set<Score> getScores() {
         return scores;
     }
 
-    public void setScores(List<Score> scores) {
+    public void setScores(Set<Score> scores) {
         this.scores = scores;
     }
 

@@ -2,7 +2,6 @@ package com.codeoftheweb.salvo;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -40,6 +39,9 @@ public class SalvoController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
 
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;
@@ -138,38 +140,52 @@ public class SalvoController {
 
     }
 
-    @PostMapping ("/games/players/{gamePlayerId}/salvoes")
-    public ResponseEntity<Map<String, Object>> saveSalvoes(@PathVariable Long gamePlayerId, @RequestBody Salvo salvo, Authentication authentication){
+    @PostMapping("/games/players/{gamePlayerId}/salvoes")
+    public ResponseEntity<Map<String, Object>> saveSalvoes(@PathVariable Long gamePlayerId, @RequestBody Salvo salvo, Authentication authentication) {
         if (isGuest(authentication)) {
             return new ResponseEntity<>(makeMap("error", "No estas logeado"), HttpStatus.UNAUTHORIZED);
-        }else{
+        } else {
             Optional<GamePlayer> gpId = gamePlayerRepository.findById(gamePlayerId);
-            Player authenticationPlayer = playerRepository.findByUserName(authentication.getName());
-            if (gpId.isEmpty()) {
-                return new ResponseEntity<>(makeMap("error", "no se puede encontrar el gameplayer solicitado"), HttpStatus.NOT_FOUND);
-            }else if (gpId.get().getPlayer().getId() != authenticationPlayer.getId()) {
-                return new ResponseEntity<>(makeMap("error", "el juego no corresponde al jugador"), HttpStatus.UNAUTHORIZED);
-            }else if (salvo.getSalvoLocation().size() > 5 ) {
-                return new ResponseEntity<>(makeMap("error", "no puedes enviar mas de 5 disparos "), HttpStatus.FORBIDDEN);
-            }else if(gpId.get().getSalvos().size() == salvo.getTurn()){
-                return new ResponseEntity<>(makeMap("error", "no puedes disparar mas de un salvo en tu turno"), HttpStatus.FORBIDDEN);
-            }else if (gpId.get().getSalvos().size() +1 != salvo.getTurn()) {
-                return new ResponseEntity<>(makeMap("error", "no puedes saltear turnos"), HttpStatus.FORBIDDEN);
-            }
-            else {
+            if (gpId.isPresent()) {
+
+                Player authenticationPlayer = playerRepository.findByUserName(authentication.getName());
                 Optional<GamePlayer> player2 = gpId.get().getGame().getGamePlayers().stream().filter(gamePlayer -> gamePlayer.getId() != gpId.get().getId()).findFirst();
-                if(player2.isPresent()){
-                    if(gpId.get().getSalvos().size() - player2.get().getSalvos().size() >= 1) {
-                        return new ResponseEntity<>(makeMap("error", "no te podes robarle turnos a tu oponente"), HttpStatus.FORBIDDEN);
+                if (gpId.get().getPlayer().getId() != authenticationPlayer.getId()) {
+                    return new ResponseEntity<>(makeMap("error", "el juego no corresponde al jugador"), HttpStatus.UNAUTHORIZED);
+                } else if (salvo.getSalvoLocation().size() == 6) {
+                    return new ResponseEntity<>(makeMap("error", "no puedes enviar mas de 5 disparos "), HttpStatus.FORBIDDEN);
+                } else if (gpId.get().getSalvos().size() == salvo.getTurn()) {
+                    return new ResponseEntity<>(makeMap("error", "no puedes disparar mas de un salvo en tu turno"), HttpStatus.FORBIDDEN);
+                } else if (gpId.get().getSalvos().size() + 1 != salvo.getTurn()) {
+                        return new ResponseEntity<>(makeMap("Error", "aun no es tu turno"), HttpStatus.FORBIDDEN);
+                } else {
+                    if (player2.isPresent()) {
+                        if (gpId.get().getSalvos().size() - player2.get().getSalvos().size() >= 1) {
+                            return new ResponseEntity<>(makeMap("error", "no te podes robarle turnos a tu oponente"), HttpStatus.FORBIDDEN);
+                        }
+                        Salvo salvoe = new Salvo(salvo.getTurn(), gpId.get(), salvo.getSalvoLocation());
+                        salvoRepository.save(salvoe);
+                        gpId.get().getSalvos().add(salvoe);
+                        if (gpId.get().gameStatus() == GameStatus.TIE) {
+                            scoreRepository.save(new Score(LocalDateTime.now(), gpId.get().getGame(), gpId.get().getPlayer(), 0.5));
+                            scoreRepository.save(new Score(LocalDateTime.now(), gpId.get().getGame(), gpId.get().getPlayer2().get().getPlayer(), 0.5));
+                        } else if (gpId.get().gameStatus() == GameStatus.WIN) {
+                            scoreRepository.save(new Score(LocalDateTime.now(), gpId.get().getGame(), gpId.get().getPlayer(), 1.0));
+                            scoreRepository.save(new Score(LocalDateTime.now(), gpId.get().getGame(), gpId.get().getPlayer2().get().getPlayer(), 0.0));
+                        } else if (gpId.get().gameStatus() == GameStatus.LOSE) {
+                            scoreRepository.save(new Score(LocalDateTime.now(), gpId.get().getGame(), gpId.get().getPlayer2().get().getPlayer(), 1.0));
+                            scoreRepository.save(new Score(LocalDateTime.now(), gpId.get().getGame(), gpId.get().getPlayer(), 0.0));
+                        }
+                        return new ResponseEntity<>(makeMap("bien", "realizaste tus disparon"), HttpStatus.CREATED);
+                    } else {
+                        return new ResponseEntity<>(makeMap("error", "esperando oponente"), HttpStatus.NOT_FOUND);
                     }
-                    Salvo salvoe = new Salvo(salvo.getTurn(),gpId.get(),salvo.getSalvoLocation());
-                    salvoRepository.save(salvoe);
-                    return new ResponseEntity<>(makeMap("bien", "realizaste tus disparon"), HttpStatus.CREATED);
-                }else{
-                    return new ResponseEntity<>(makeMap("error","el oponente no existe"), HttpStatus.NOT_FOUND);
                 }
+            } else {
+                return new ResponseEntity<>(makeMap("error", "no existe el player"), HttpStatus.FORBIDDEN);
             }
-    }}
+        }
+    }
 
     @GetMapping("/gamePlayers")
     public Set<Map<String, Object>> getGamePlayers() {
@@ -188,8 +204,10 @@ public class SalvoController {
                 return new ResponseEntity<>(makeMap("error", "The game does not exist"), HttpStatus.NOT_FOUND);
             } else if (gamePlayer.get().getPlayer().getId() != player.getId()) {
                 return new ResponseEntity<>(makeMap("error", "You can only see your ships"), HttpStatus.FORBIDDEN);
+            } else {
+                return new ResponseEntity<>(gameViewDTO(gamePlayer.get()), HttpStatus.OK);
             }
-            return new ResponseEntity<>(gameViewDTO(gamePlayer.get()), HttpStatus.OK);
+
         }
     }
 
@@ -211,12 +229,15 @@ public class SalvoController {
         return playerRepository.findAll().stream().map(this::playersDTO).collect(Collectors.toList());
     }
 
+    @GetMapping("/games/players/{gamePlayerId}/salvoes")
+
 
     public Map<String, Object> gameDTO(Game game) {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", game.getId());
         dto.put("date", game.getCreationDate());
         dto.put("gamePlayers", game.getGamePlayers().stream().map(this::gamePlayersDTO).collect(toSet()));
+
         return dto;
     }
 
@@ -232,6 +253,8 @@ public class SalvoController {
         dtoGamePlayer.put("id", gamePlayer.getId());
         dtoGamePlayer.put("player", playersDTO(gamePlayer.getPlayer()));
         dtoGamePlayer.put("score", gamePlayer.getScore().map(Score::getScore).orElse(null));
+
+
         return dtoGamePlayer;
     }
 
@@ -254,26 +277,30 @@ public class SalvoController {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", gamePlayer.getGame().getId());
         dto.put("date", gamePlayer.getGame().getCreationDate());
+        dto.put("statusGame", gamePlayer.gameStatus());
         dto.put("gamePlayers", gamePlayer.getGame().getGamePlayers().stream().map(this::gamePlayersDTO).collect(toSet()));
         dto.put("ships", gamePlayer.getShips().stream().map(this::shipDTO).collect(toSet()));
         dto.put("salvo", gamePlayer.getGame().getGamePlayers().stream().flatMap(i -> i.getSalvos().stream().map(this::salvoDTO)).collect(toSet()));
         dto.put("hitsSalvoP1", gamePlayer.getSalvos().stream().map(this::hitsDTO).collect(toSet()));
         dto.put("sunkShipsP2", gamePlayer.getSalvos().stream().map(this::sunksDTO).collect(toSet()));
-        dto.put("hitsSalvoP2", gamePlayer.getGame().getGamePlayers().stream().filter(player -> player.getId() != gamePlayer.getId()).flatMap(player -> player.getSalvos().stream().map(this::hitsDTO)).collect(toSet()));
-        dto.put("sunkShipsP1",  gamePlayer.getGame().getGamePlayers().stream().filter(player -> player.getId() != gamePlayer.getId()).flatMap(player -> player.getSalvos().stream().map(this::sunksDTO)).collect(toSet()));
+        if (gamePlayer.getPlayer2().isPresent()) {
+            dto.put("hitsSalvoP2", gamePlayer.getPlayer2().get().getSalvos().stream().map(this::hitsDTO).collect(toSet()));
+            dto.put("sunkShipsP1", gamePlayer.getPlayer2().get().getSalvos().stream().map(this::sunksDTO).collect(toSet()));
+        }
         return dto;
     }
-    public Map<String,Object> hitsDTO (Salvo salvo) {
+
+    public Map<String, Object> hitsDTO(Salvo salvo) {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("turn", salvo.getTurn());
         dto.put("hitsOnShips", salvo.getHits());
         return dto;
     }
 
-    public Map<String,Object> sunksDTO (Salvo salvo) {
+    public Map<String, Object> sunksDTO(Salvo salvo) {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("turn", salvo.getTurn());
-        dto.put("sunkShips",salvo.getSunks().stream().map(this::shipDTO));
+        dto.put("sunkShips", salvo.getSunks().stream().map(this::shipDTO));
         return dto;
     }
 
@@ -282,4 +309,6 @@ public class SalvoController {
         map.put(key, value);
         return map;
     }
+
+
 }

@@ -8,6 +8,19 @@ var app = new Vue({
         player: null,
     },
     methods: {
+        getData: function() {
+            fetch('http://localhost:8080/api/games')
+                .then(function(respuesta) {
+                    return respuesta.json();
+                })
+                .then((data) => {
+
+                    this.player = data.player
+                    this.games = data.games;
+                    this.players();
+                    this.tablaScore();
+                })
+        },
 
         players: function() {
             var players = [];
@@ -114,17 +127,10 @@ var app = new Vue({
             $.post("/api/games/" + gameId + "/players")
                 .done(function(joinGpIdPlayer) { location.href = "http://localhost:8080/web/game.html?gp=" + joinGpIdPlayer.gpId })
                 .fail(function() { alert("no podes ingresar al juego") })
-        }
+        },
+
+    },
+    mounted: function() {
+        this.getData();
     }
 })
-
-fetch('http://localhost:8080/api/games')
-    .then(function(respuesta) {
-        return respuesta.json();
-    })
-    .then(function(data) {
-        app.player = data.player
-        app.games = data.games;
-        app.players();
-        app.tablaScore();
-    })
