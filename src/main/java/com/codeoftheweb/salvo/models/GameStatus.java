@@ -1,4 +1,4 @@
-package com.codeoftheweb.salvo;
+package com.codeoftheweb.salvo.models;
 
 public enum GameStatus {
     TIE,WIN,LOSE,PLACE_SHIPS,WAIT_OPPONENT,PLACE_SALVOS,WAIT_SHIP_OPPONENT,WAIT_SALVO_OPPONENT,PLACE_YOUR_SALVOS;
