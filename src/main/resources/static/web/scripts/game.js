@@ -31,7 +31,7 @@ var app = new Vue({
     },
     methods: {
         getData: function() {
-            fetch('http://localhost:8080/api/game_view/' + gameViewParam)
+            fetch('/api/game_view/' + gameViewParam)
                 .then(function(respuesta) {
                     return respuesta.json();
                 })
