@@ -9,7 +9,7 @@ var app = new Vue({
     },
     methods: {
         getData: function() {
-            fetch('api/games')
+            fetch('/api/games')
                 .then(function(respuesta) {
                     return respuesta.json();
                 })
@@ -119,12 +119,12 @@ var app = new Vue({
         },
         createGame: function() {
             $.post("/api/games")
-                .done(function(data) { location.href = "http://localhost:8080/web/game.html?gp=" + data.gpId })
+                .done(function(data) { location.href = "/web/game.html?gp=" + data.gpId })
                 .fail(function() { alert("Can't create the game") })
         },
         joinGame: function(gameId) {
             $.post("/api/games/" + gameId + "/players")
-                .done(function(joinGpIdPlayer) { location.href = "http://localhost:8080/web/game.html?gp=" + joinGpIdPlayer.gpId })
+                .done(function(joinGpIdPlayer) { location.href = "/web/game.html?gp=" + joinGpIdPlayer.gpId })
                 .fail(function() { alert("no podes ingresar al juego") })
         },
 

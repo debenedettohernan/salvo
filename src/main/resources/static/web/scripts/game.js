@@ -36,7 +36,6 @@ var app = new Vue({
                     return respuesta.json();
                 })
                 .then((data) => {
-
                     this.games = data;
                     this.asignarUbicacion();
                     this.pantallaJugador();
