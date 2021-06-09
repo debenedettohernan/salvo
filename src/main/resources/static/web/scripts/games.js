@@ -9,12 +9,11 @@ var app = new Vue({
     },
     methods: {
         getData: function() {
-            fetch('http://localhost:8080/api/games')
+            fetch('api/games')
                 .then(function(respuesta) {
                     return respuesta.json();
                 })
                 .then((data) => {
-
                     this.player = data.player
                     this.games = data.games;
                     this.players();
